@@ -132,6 +132,11 @@ class ClosedCheckoutMandate(BaseModel):
     type: Literal["closed_checkout"] = "closed_checkout"
     parent_jti: str
     session_id: str
+    #: The constraints the AGENT believes apply. This is agent-asserted context,
+    #: derived from tool output and catalog text -- none of which is signed by
+    #: the user. The naive verifier trusts it; the guard ignores it entirely and
+    #: reads the user-signed open mandate instead. This field IS threat T-1.
+    asserted_constraints: Optional[CheckoutConstraints] = None
     checkout_hash: str
     amount_paise: int
     merchant_id: str

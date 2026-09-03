@@ -37,6 +37,7 @@ class Settings:
         self.llm_model: str = os.environ.get("LLM_MODEL", "gpt-4o-mini").strip()
         self.llm_temperature: float = float(os.environ.get("LLM_TEMPERATURE", "0"))
         self.llm_seed: int = int(os.environ.get("LLM_SEED", "1337"))
+        self.llm_timeout_seconds: float = float(os.environ.get("LLM_TIMEOUT_SECONDS", "45"))
 
         self.db_path: str = os.environ.get("DB_PATH", "mandateguard.db").strip()
 

@@ -94,10 +94,16 @@ class KeyRegistry:
         return {name: kp.public_pem for name, kp in self.keypairs.items()}
 
 
+#: Every principal in the system gets its own keypair. `trusted_surface_key`
+#: is the step-up/risk authority (AP2's "Trusted Surface"); the shopping agent
+#: must NOT hold it, which is exactly what makes guard G3 enforceable.
+PRINCIPALS = ("user_key", "agent_key", "merchant_key", "trusted_surface_key")
+
+
 def build_registry() -> KeyRegistry:
-    """Create the three-key world: user, agent, merchant."""
+    """Create the key world: user, agent, merchant, trusted surface."""
     reg = KeyRegistry()
-    for name in ("user_key", "agent_key", "merchant_key"):
+    for name in PRINCIPALS:
         reg.add(generate_keypair(name))
     return reg
 
