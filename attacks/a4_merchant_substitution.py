@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import Optional
 
 from agent.session import ShoppingSession
-from attacks import AttackResult, mode_of
+from attacks import AttackResult, checks_of, mode_of
 from config import Mode, Settings, get_settings
 from mandates.schemas import UserIntent
 
@@ -61,6 +61,7 @@ def _run(mode: Mode, settings: Optional[Settings], payee: str, name: str, note: 
         order_id=result.order.order_id if result.order else None,
         order_provenance=result.order.provenance if result.order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(result.outcome),
         detail={
             "allowlisted_merchant": CANONICAL,
             "actual_payee": payee,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-04T08:40:05.570713+00:00",
+  "generated_at": "2026-09-04T08:57:39.556087+00:00",
   "environment": {
     "python": "3.12.13",
     "razorpay": "live-test-mode",
@@ -30,11 +30,109 @@
         "threat_ref": "F1 / T-1 (AM1 consent-capture poisoning)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user stated a budget of 200000 paise; approval screen displayed 200000 paise; the mandate actually signed committed to 249900 paise (faithful=False, rendered_by=agent). Cart totalled 249900 paise. ORDER CREATED order_TXtfobzdetLirp for 249900 paise (razorpay-test-mode) -- user overspent by 49900 paise while every signature verified and every downstream check passed honestly.",
+        "evidence": "user stated a budget of 200000 paise; approval screen displayed 200000 paise; the mandate actually signed committed to 249900 paise (faithful=False, rendered_by=agent). Cart totalled 249900 paise. ORDER CREATED order_TXtyLh5NbGqvA7 for 249900 paise (razorpay-test-mode) -- user overspent by 49900 paise while every signature verified and every downstream check passed honestly.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfobzdetLirp",
+        "order_id": "order_TXtyLh5NbGqvA7",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "deterministic-stub (assumes a fully compromised model)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 95527c90..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (249900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 249900 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "user_stated_budget_paise": 200000,
           "agent_proposed_cap_paise": 249900,
@@ -58,6 +156,80 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "deterministic-stub (assumes a fully compromised model)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate c4801e37..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:29.922501+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 72f2dbab... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:29.922818+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 04f62019... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (249900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": false,
+            "guard": "G1",
+            "detail": "cart total 249900 paise exceeds user cap 200000 paise by 49900"
+          }
+        ],
         "detail": {
           "user_stated_budget_paise": 200000,
           "agent_proposed_cap_paise": 249900,
@@ -86,11 +258,109 @@
         "threat_ref": "F1 / T-1 (AM1 consent-capture poisoning)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user stated a budget of 200000 paise; approval screen displayed 200000 paise; the mandate actually signed committed to 249900 paise (faithful=False, rendered_by=agent). Cart totalled 219900 paise. ORDER CREATED order_TXtfovLnFipnVz for 219900 paise (razorpay-test-mode) -- user overspent by 19900 paise while every signature verified and every downstream check passed honestly.",
+        "evidence": "user stated a budget of 200000 paise; approval screen displayed 200000 paise; the mandate actually signed committed to 249900 paise (faithful=False, rendered_by=agent). Cart totalled 219900 paise. ORDER CREATED order_TXtyM0kQXYa60t for 219900 paise (razorpay-test-mode) -- user overspent by 19900 paise while every signature verified and every downstream check passed honestly.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfovLnFipnVz",
+        "order_id": "order_TXtyM0kQXYa60t",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "deterministic-stub (assumes a fully compromised model)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate fe568352..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (219900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 249900 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "user_stated_budget_paise": 200000,
           "agent_proposed_cap_paise": 249900,
@@ -114,6 +384,80 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "deterministic-stub (assumes a fully compromised model)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate d3a793cc..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:30.225787+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 41c00104... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:30.226268+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce b46301c8... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (219900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": false,
+            "guard": "G1",
+            "detail": "cart total 219900 paise exceeds user cap 200000 paise by 19900"
+          }
+        ],
         "detail": {
           "user_stated_budget_paise": 200000,
           "agent_proposed_cap_paise": 249900,
@@ -142,11 +486,109 @@
         "threat_ref": "F1 / T-1 via SR3 (simplified: claimed-field trust failure)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user-signed cap was 200000 paise; the agent asserted a cap of 249900 paise alongside the mandate. ORDER CREATED order_TXtfpFhqzuya3O for 249900 paise (razorpay-test-mode)",
+        "evidence": "user-signed cap was 200000 paise; the agent asserted a cap of 249900 paise alongside the mandate. ORDER CREATED order_TXtyMLRF161cnx for 249900 paise (razorpay-test-mode)",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfpFhqzuya3O",
+        "order_id": "order_TXtyMLRF161cnx",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "using agent-asserted constraints (cap 249900, merchants ['merchant_alpha'])"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 57b9a53d..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (249900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 249900 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "user_signed_cap_paise": 200000,
           "agent_asserted_cap_paise": 249900,
@@ -164,6 +606,80 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "agent asserted a widened scope (cap 249900, merchants ['merchant_alpha']) -- discarded; enforcing the user-signed cap 200000"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 1e9fbbc5..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:30.506205+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce e16c3d41... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:30.506550+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 276e3ef8... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (249900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": false,
+            "guard": "G1",
+            "detail": "cart total 249900 paise exceeds user cap 200000 paise by 49900"
+          }
+        ],
         "detail": {
           "user_signed_cap_paise": 200000,
           "agent_asserted_cap_paise": 249900,
@@ -186,14 +702,112 @@
         "threat_ref": "F4 / T-31",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "one user authorisation produced order order_TXtfpUpKf4oCIt (179900 paise). Resubmitting the identical signed mandate produced a SECOND order order_TXtfpb7N75Q8cp for another 179900 paise -- the user is charged twice.",
+        "evidence": "one user authorisation produced order order_TXtyMg4zzW23IH (179900 paise). Resubmitting the identical signed mandate produced a SECOND order order_TXtyMyQGViB6h7 for another 179900 paise -- the user is charged twice.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfpb7N75Q8cp",
+        "order_id": "order_TXtyMyQGViB6h7",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 5e2dd28f..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
-          "first_order_id": "order_TXtfpUpKf4oCIt",
-          "second_order_id": "order_TXtfpb7N75Q8cp",
+          "first_order_id": "order_TXtyMg4zzW23IH",
+          "second_order_id": "order_TXtyMyQGViB6h7",
           "amount_paise": 179900,
           "total_charged_paise": 359800,
           "authorisations_signed": 1,
@@ -206,19 +820,57 @@
         "threat_ref": "F4 / T-31",
         "mode": "guarded",
         "succeeded": false,
-        "evidence": "one user authorisation produced order order_TXtfpoFvzdudCy (179900 paise). Resubmitting the identical signed mandate was rejected: checkout.nonce: nonce 6724d61c... has already been consumed -- replay rejected",
+        "evidence": "one user authorisation produced order order_TXtyNPWMLYn6tr (179900 paise). Resubmitting the identical signed mandate was rejected: checkout.nonce: nonce 306ce4de... has already been consumed -- replay rejected",
         "guard_that_blocked": "G2",
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate ecc6924a..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:31.124100+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": false,
+            "guard": "G2",
+            "detail": "nonce 306ce4de... has already been consumed -- replay rejected"
+          }
+        ],
         "detail": {
-          "first_order_id": "order_TXtfpoFvzdudCy",
+          "first_order_id": "order_TXtyNPWMLYn6tr",
           "second_order_id": null,
           "amount_paise": 179900,
           "total_charged_paise": 179900,
           "authorisations_signed": 1,
           "orders_created": 1,
-          "failed_check": "checkout.nonce: nonce 6724d61c... has already been consumed -- replay rejected"
+          "failed_check": "checkout.nonce: nonce 306ce4de... has already been consumed -- replay rejected"
         }
       },
       "blocked": true,
@@ -236,11 +888,109 @@
         "threat_ref": "F4 / T-31",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "after a 1.5s pause the identical signed mandate created a second order order_TXtfrmXJ3tfUiE",
+        "evidence": "after a 1.5s pause the identical signed mandate created a second order order_TXtyPUAxtqwqCI",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfrmXJ3tfUiE",
+        "order_id": "order_TXtyPUAxtqwqCI",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 1ca8b997..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "delay_seconds": 1.5,
           "failed_check": ""
@@ -251,14 +1001,52 @@
         "threat_ref": "F4 / T-31",
         "mode": "guarded",
         "succeeded": false,
-        "evidence": "after a 1.5s pause the identical signed mandate was rejected: checkout.nonce: nonce 2302ec61... has already been consumed -- replay rejected",
+        "evidence": "after a 1.5s pause the identical signed mandate was rejected: checkout.nonce: nonce a00bf2e7... has already been consumed -- replay rejected",
         "guard_that_blocked": "G2",
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 492f4aa6..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:33.340532+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": false,
+            "guard": "G2",
+            "detail": "nonce a00bf2e7... has already been consumed -- replay rejected"
+          }
+        ],
         "detail": {
           "delay_seconds": 1.5,
-          "failed_check": "checkout.nonce: nonce 2302ec61... has already been consumed -- replay rejected"
+          "failed_check": "checkout.nonce: nonce a00bf2e7... has already been consumed -- replay rejected"
         }
       },
       "blocked": true,
@@ -276,13 +1064,111 @@
         "threat_ref": "F4 / T-31 (freshness)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "mandate expired at 2026-09-04T07:40:01.818131+00:00 (one hour before submission) and was still honoured: order order_TXtftw17yJNp3v created",
+        "evidence": "mandate expired at 2026-09-04T07:57:35.208984+00:00 (one hour before submission) and was still honoured: order order_TXtyRlsQtQ0a6x created",
         "guard_that_blocked": null,
-        "order_id": "order_TXtftw17yJNp3v",
+        "order_id": "order_TXtyRlsQtQ0a6x",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate a4c05b3d..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
-          "expires_at": "2026-09-04T07:40:01.818131+00:00",
+          "expires_at": "2026-09-04T07:57:35.208984+00:00",
           "failed_check": ""
         }
       },
@@ -291,14 +1177,46 @@
         "threat_ref": "F4 / T-31 (freshness)",
         "mode": "guarded",
         "succeeded": false,
-        "evidence": "mandate expired at 2026-09-04T07:40:02.041077+00:00 (one hour before submission) and was rejected: checkout.expiry: mandate expired at 2026-09-04T07:40:02.041077+00:00",
+        "evidence": "mandate expired at 2026-09-04T07:57:35.489898+00:00 (one hour before submission) and was rejected: checkout.expiry: mandate expired at 2026-09-04T07:57:35.489898+00:00",
         "guard_that_blocked": "G2",
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 1c468706..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": false,
+            "guard": "G2",
+            "detail": "mandate expired at 2026-09-04T07:57:35.489898+00:00"
+          }
+        ],
         "detail": {
-          "expires_at": "2026-09-04T07:40:02.041077+00:00",
-          "failed_check": "checkout.expiry: mandate expired at 2026-09-04T07:40:02.041077+00:00"
+          "expires_at": "2026-09-04T07:57:35.489898+00:00",
+          "failed_check": "checkout.expiry: mandate expired at 2026-09-04T07:57:35.489898+00:00"
         }
       },
       "blocked": true,
@@ -316,11 +1234,109 @@
         "threat_ref": "F4 / T-34",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "transaction of 179900 paise is at or above the 150000 paise step-up threshold. No challenge was performed. The agent attached an unsigned risk_data claiming {risk_score: low, step_up_completed: true, method: 3ds2} and the payment completed without step-up: order order_TXtfuATa0tVhnn.",
+        "evidence": "transaction of 179900 paise is at or above the 150000 paise step-up threshold. No challenge was performed. The agent attached an unsigned risk_data claiming {risk_score: low, step_up_completed: true, method: 3ds2} and the payment completed without step-up: order order_TXtyRzzxQOhiW2.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfuATa0tVhnn",
+        "order_id": "order_TXtyRzzxQOhiW2",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate d6c8e4fa..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "amount_paise": 179900,
           "step_up_threshold_paise": 150000,
@@ -345,6 +1361,104 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 82bdab3f..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:35.672135+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 2cac16cb... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:35.672352+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 922e5914... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": "G5",
+            "detail": "ceiling is the strictest user-signed limit: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": false,
+            "guard": "G3",
+            "detail": "no risk attestation present; step-up required"
+          }
+        ],
         "detail": {
           "amount_paise": 179900,
           "step_up_threshold_paise": 150000,
@@ -374,11 +1488,109 @@
         "threat_ref": "F4 / T-34",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "transaction of 179900 paise is at or above the 150000 paise step-up threshold. No challenge was performed. The agent attached an unsigned risk_data claiming {risk_score: low, step_up_completed: false} and the payment completed without step-up: order order_TXtfuOxNX1WR9X.",
+        "evidence": "transaction of 179900 paise is at or above the 150000 paise step-up threshold. No challenge was performed. The agent attached an unsigned risk_data claiming {risk_score: low, step_up_completed: false} and the payment completed without step-up: order order_TXtySDDrhDVW6t.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfuOxNX1WR9X",
+        "order_id": "order_TXtySDDrhDVW6t",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 24d5a691..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=False"
+          }
+        ],
         "detail": {
           "amount_paise": 179900,
           "step_up_threshold_paise": 150000,
@@ -403,6 +1615,104 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate b6c6a32d..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:35.966530+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce b75f3072... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:35.966796+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 985f3f5f... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": "G5",
+            "detail": "ceiling is the strictest user-signed limit: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": false,
+            "guard": "G3",
+            "detail": "no risk attestation present; step-up required"
+          }
+        ],
         "detail": {
           "amount_paise": 179900,
           "step_up_threshold_paise": 150000,
@@ -432,18 +1742,116 @@
         "threat_ref": "F4 / T-34 (attestation forgery)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "agent self-issued a risk attestation claiming issuer 'trusted_surface' but signed it with the AGENT key, and bound it to a bogus transaction id. It was accepted: order order_TXtfueZf3t2j8Z created without step-up.",
+        "evidence": "agent self-issued a risk attestation claiming issuer 'trusted_surface' but signed it with the AGENT key, and bound it to a bogus transaction id. It was accepted: order order_TXtySW7VEyskR8 created without step-up.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfueZf3t2j8Z",
+        "order_id": "order_TXtySW7VEyskR8",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 0ef6513b..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "amount_paise": 179900,
           "step_up_threshold_paise": 150000,
           "claimed_issuer": "trusted_surface",
           "actual_signing_key": "agent_key",
           "attestation_transaction_id": "0000000000000000000000000000000000000000000000000000000000000000",
-          "real_checkout_hash": "c408e6382a37c5ae3b9d52871a7dafede76577712a657b3b78e2ab070827f4d6",
+          "real_checkout_hash": "75d409c0b69ad31dadc788d039922f9af55df3c6e251552b75b61e09243e257d",
           "step_up_required_by_verifier": false,
           "failed_check": ""
         }
@@ -458,13 +1866,111 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate eb0dff64..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:36.226507+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce b72da48a... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:36.226873+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 2f3bf9f2... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": "G5",
+            "detail": "ceiling is the strictest user-signed limit: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": false,
+            "guard": "G3",
+            "detail": "risk attestation is not signed by any authorised issuer -- rejected, step-up forced"
+          }
+        ],
         "detail": {
           "amount_paise": 179900,
           "step_up_threshold_paise": 150000,
           "claimed_issuer": "trusted_surface",
           "actual_signing_key": "agent_key",
           "attestation_transaction_id": "0000000000000000000000000000000000000000000000000000000000000000",
-          "real_checkout_hash": "d0399672594beed4f241a2a0deeb0690b5cf33aa729a5574073db3e51cd35570",
+          "real_checkout_hash": "ef76fea5ce222a1dc75251d7865e5a295a330c8756a597674d81c75e1b1d8e77",
           "step_up_required_by_verifier": true,
           "failed_check": "risk.attested: risk attestation is not signed by any authorised issuer -- rejected, step-up forced"
         }
@@ -484,11 +1990,109 @@
         "threat_ref": "F3 / T-27",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'merchant_a1pha' (ASCII homoglyph: digit '1' for letter 'l'). The order was created anyway: order_TXtfuznit5Bzf3 for 169900 paise -- funds go to the wrong party.",
+        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'merchant_a1pha' (ASCII homoglyph: digit '1' for letter 'l'). The order was created anyway: order_TXtySzJQpj5jII for 169900 paise -- funds go to the wrong party.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfuznit5Bzf3",
+        "order_id": "order_TXtySzJQpj5jII",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 4adb0c05..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (169900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_a1pha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_a1pha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "merchant_a1pha",
@@ -509,6 +2113,80 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 20945379..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:36.569086+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce f3519f20... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:36.569574+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce c89a36cc... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (169900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": false,
+            "guard": "G1",
+            "detail": "merchant 'merchant_a1pha' is not in the user's allowlist"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "merchant_a1pha",
@@ -534,11 +2212,109 @@
         "threat_ref": "F3 / T-27",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'merchant_\u0430lpha' (Unicode homoglyph: Cyrillic 'a' U+0430 for Latin 'a'). The order was created anyway: order_TXtfvHtMLhLVej for 179900 paise -- funds go to the wrong party.",
+        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'merchant_\u0430lpha' (Unicode homoglyph: Cyrillic 'a' U+0430 for Latin 'a'). The order was created anyway: order_TXtyTR45dFcm2z for 179900 paise -- funds go to the wrong party.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfvHtMLhLVej",
+        "order_id": "order_TXtyTR45dFcm2z",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 9861dca0..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_\u0430lpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_\u0430lpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "merchant_\u0430lpha",
@@ -559,6 +2335,86 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 335cbc18..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:37.071751+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 3ffeee98... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:37.072239+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 2ee489cd... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": false,
+            "guard": "G4",
+            "detail": "'merchant_\u0430lpha' is not in the pinned allowlist; closest entry is 'merchant_alpha' at 93% similarity -- rejected (exact match required)"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "merchant_\u0430lpha",
@@ -584,11 +2440,109 @@
         "threat_ref": "F3 / T-27",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'Merchant_Alpha' (case variation erased by casefolding). The order was created anyway: order_TXtfvU5Hw2BxeX for 179900 paise -- funds go to the wrong party.",
+        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'Merchant_Alpha' (case variation erased by casefolding). The order was created anyway: order_TXtyTlgQL4tfyy for 179900 paise -- funds go to the wrong party.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfvU5Hw2BxeX",
+        "order_id": "order_TXtyTlgQL4tfyy",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate a965a2bb..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'Merchant_Alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'Merchant_Alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "Merchant_Alpha",
@@ -610,6 +2564,86 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 1c9cdf95..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:37.362859+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce c280d072... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:37.363386+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 4182e1b7... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": false,
+            "guard": "G4",
+            "detail": "'Merchant_Alpha' is not in the pinned allowlist; closest entry is 'merchant_alpha' at 86% similarity -- rejected (exact match required)"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "Merchant_Alpha",
@@ -636,11 +2670,109 @@
         "threat_ref": "F3 / T-27",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'merchant_alpha_payouts' (suffix extension accepted by substring matching). The order was created anyway: order_TXtfvi52rwCUxo for 179900 paise -- funds go to the wrong party.",
+        "evidence": "user allowlisted 'merchant_alpha'. Payment was routed to 'merchant_alpha_payouts' (suffix extension accepted by substring matching). The order was created anyway: order_TXtyU57KDZgrXt for 179900 paise -- funds go to the wrong party.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfvi52rwCUxo",
+        "order_id": "order_TXtyU57KDZgrXt",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 9a9c9a4e..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha_payouts' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha_payouts' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "merchant_alpha_payouts",
@@ -659,6 +2791,86 @@
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate f0c4d8c4..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:37.732099+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce c0938bbb... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:37.732589+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 9c9164fd... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": false,
+            "guard": "G4",
+            "detail": "'merchant_alpha_payouts' is not in the pinned allowlist; closest entry is 'merchant_alpha' at 78% similarity -- rejected (exact match required)"
+          }
+        ],
         "detail": {
           "allowlisted_merchant": "merchant_alpha",
           "actual_payee": "merchant_alpha_payouts",
@@ -682,14 +2894,112 @@
         "threat_ref": "F4 / T-31 (deployment)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "mandate already consumed by verifier instance 1 (order order_TXtfw2MmbQc2Qm) was resubmitted to a second verifier replica. NOT BLOCKED -- order order_TXtfwAEiWSXLxF created; the user is charged twice.",
+        "evidence": "mandate already consumed by verifier instance 1 (order order_TXtyUcY0YAyA84) was resubmitted to a second verifier replica. NOT BLOCKED -- order order_TXtyUjQORx3XP1 created; the user is charged twice.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfwAEiWSXLxF",
+        "order_id": "order_TXtyUjQORx3XP1",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 5aee347b..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (179900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
-          "first_order_id": "order_TXtfw2MmbQc2Qm",
-          "replica_order_id": "order_TXtfwAEiWSXLxF",
+          "first_order_id": "order_TXtyUcY0YAyA84",
+          "replica_order_id": "order_TXtyUjQORx3XP1",
           "shared_nonce_store": "mandateguard.db",
           "remaining_limitation": "one SQLite file covers a single host; multi-region deployment needs a distributed store with first-writer-wins consensus",
           "failed_check": ""
@@ -700,17 +3010,55 @@
         "threat_ref": "F4 / T-31 (deployment)",
         "mode": "guarded",
         "succeeded": false,
-        "evidence": "mandate already consumed by verifier instance 1 (order order_TXtfwNX0PPpcH5) was resubmitted to a second verifier replica. Blocked: checkout.nonce: nonce b44cffac... has already been consumed -- replay rejected",
+        "evidence": "mandate already consumed by verifier instance 1 (order order_TXtyV0uSjDOGo5) was resubmitted to a second verifier replica. Blocked: checkout.nonce: nonce 2dc7b0cc... has already been consumed -- replay rejected",
         "guard_that_blocked": "G2",
         "order_id": null,
         "order_provenance": null,
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 0d31c124..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:38.144813+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": false,
+            "guard": "G2",
+            "detail": "nonce 2dc7b0cc... has already been consumed -- replay rejected"
+          }
+        ],
         "detail": {
-          "first_order_id": "order_TXtfwNX0PPpcH5",
+          "first_order_id": "order_TXtyV0uSjDOGo5",
           "replica_order_id": null,
           "shared_nonce_store": "mandateguard.db",
           "remaining_limitation": "one SQLite file covers a single host; multi-region deployment needs a distributed store with first-writer-wins consensus",
-          "failed_check": "checkout.nonce: nonce b44cffac... has already been consumed -- replay rejected"
+          "failed_check": "checkout.nonce: nonce 2dc7b0cc... has already been consumed -- replay rejected"
         }
       },
       "blocked": true,
@@ -728,11 +3076,109 @@
         "threat_ref": "F1 / T-7 (rendered-vs-signed)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user reviewed and approved a cart totalling 129900 paise; the cart actually signed and charged totalled 189900 paise (+60000), still within the 200000 paise ceiling, correct merchant, correct category. NOT BLOCKED -- order order_TXtfwaXB3vVrNg created.",
+        "evidence": "user reviewed and approved a cart totalling 129900 paise; the cart actually signed and charged totalled 189900 paise (+60000), still within the 200000 paise ceiling, correct merchant, correct category. NOT BLOCKED -- order order_TXtyVKV3mQxkwt created.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfwaXB3vVrNg",
+        "order_id": "order_TXtyVKV3mQxkwt",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 87bd390f..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (189900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=True"
+          }
+        ],
         "detail": {
           "reviewed_total_paise": 129900,
           "signed_total_paise": 189900,
@@ -745,11 +3191,109 @@
         "threat_ref": "F1 / T-7 (rendered-vs-signed)",
         "mode": "guarded",
         "succeeded": true,
-        "evidence": "user reviewed and approved a cart totalling 129900 paise; the cart actually signed and charged totalled 189900 paise (+60000), still within the 200000 paise ceiling, correct merchant, correct category. NOT BLOCKED -- order order_TXtfx03b2zQqal created.",
+        "evidence": "user reviewed and approved a cart totalling 129900 paise; the cart actually signed and charged totalled 189900 paise (+60000), still within the 200000 paise ceiling, correct merchant, correct category. NOT BLOCKED -- order order_TXtyViQsfIH23V created.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfx03b2zQqal",
+        "order_id": "order_TXtyViQsfIH23V",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate fb85ca7f..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:38.692298+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 2dc80e6b... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:38.692631+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 249e5cb0... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (189900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": "G5",
+            "detail": "ceiling is the strictest user-signed limit: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": "G3",
+            "detail": "attested by 'trusted_surface': risk=low, step_up_completed=True, method=3ds2"
+          }
+        ],
         "detail": {
           "reviewed_total_paise": 129900,
           "signed_total_paise": 189900,
@@ -772,11 +3316,109 @@
         "threat_ref": "F2 / key compromise (blast radius)",
         "mode": "vulnerable",
         "succeeded": true,
-        "evidence": "user's stated goal was 'buy running shoes'. An attacker holding the agent key purchased a different in-scope item for 89900 paise. NOT BLOCKED -- order order_TXtfxRzbMRi7ON created; every constraint the user approved was satisfied.",
+        "evidence": "user's stated goal was 'buy running shoes'. An attacker holding the agent key purchased a different in-scope item for 89900 paise. NOT BLOCKED -- order order_TXtyVzLeAYhbJR created; every constraint the user approved was satisfied.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfxRzbMRi7ON",
+        "order_id": "order_TXtyVzLeAYhbJR",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": null,
+            "detail": "no agent assertion; using user constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 20009829..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": null,
+            "detail": "expiry not enforced"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": null,
+            "detail": "nonce not tracked"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": null,
+            "detail": "checkout_hash taken from the mandate as-is (not re-derived)"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (89900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": null,
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": null,
+            "detail": "fuzzy merchant match for 'merchant_alpha' -> True"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": null,
+            "detail": "ceiling taken from agent-supplied context: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": null,
+            "detail": "trusted unsigned risk_data: risk_score=low, step_up_completed=False"
+          }
+        ],
         "detail": {
           "user_goal": "buy running shoes",
           "purchased": [
@@ -793,11 +3435,109 @@
         "threat_ref": "F2 / key compromise (blast radius)",
         "mode": "guarded",
         "succeeded": true,
-        "evidence": "user's stated goal was 'buy running shoes'. An attacker holding the agent key purchased a different in-scope item for 89900 paise. NOT BLOCKED -- order order_TXtfxkT6lUp3l4 created; every constraint the user approved was satisfied.",
+        "evidence": "user's stated goal was 'buy running shoes'. An attacker holding the agent key purchased a different in-scope item for 89900 paise. NOT BLOCKED -- order order_TXtyWGWUblFnHp created; every constraint the user approved was satisfied.",
         "guard_that_blocked": null,
-        "order_id": "order_TXtfxkT6lUp3l4",
+        "order_id": "order_TXtyWGWUblFnHp",
         "order_provenance": "razorpay-test-mode",
         "agent_kind": "scripted (no LLM involved -- protocol-level)",
+        "checks": [
+          {
+            "check": "open_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "open mandates verified against the user public key"
+          },
+          {
+            "check": "closed_mandate.signature",
+            "passed": true,
+            "guard": "G5",
+            "detail": "closed mandates verified against the agent public key"
+          },
+          {
+            "check": "constraints.source",
+            "passed": true,
+            "guard": "G1",
+            "detail": "enforcing the user-signed constraints"
+          },
+          {
+            "check": "delegation.parent",
+            "passed": true,
+            "guard": "G5",
+            "detail": "chains to open mandate 50f58090..."
+          },
+          {
+            "check": "checkout.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:39.298814+00:00"
+          },
+          {
+            "check": "checkout.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce 9a26cdd5... consumed (first use)"
+          },
+          {
+            "check": "payment.expiry",
+            "passed": true,
+            "guard": "G2",
+            "detail": "mandate valid until 2026-09-04T09:07:39.299194+00:00"
+          },
+          {
+            "check": "payment.nonce",
+            "passed": true,
+            "guard": "G2",
+            "detail": "nonce c8eae1dd... consumed (first use)"
+          },
+          {
+            "check": "checkout_hash.rederived",
+            "passed": true,
+            "guard": "G5",
+            "detail": "checkout_hash independently re-derived from the cart and matches"
+          },
+          {
+            "check": "payment.binding",
+            "passed": true,
+            "guard": "G5",
+            "detail": "payment is bound to this checkout_hash"
+          },
+          {
+            "check": "amount.consistency",
+            "passed": true,
+            "guard": "G5",
+            "detail": "mandate amount matches the cart total (89900 paise)"
+          },
+          {
+            "check": "scope.recheck",
+            "passed": true,
+            "guard": "G1",
+            "detail": "cart is within user-authorised scope"
+          },
+          {
+            "check": "merchant.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payee.pinned",
+            "passed": true,
+            "guard": "G4",
+            "detail": "merchant 'merchant_alpha' exactly matches the pinned allowlist"
+          },
+          {
+            "check": "payment.ceiling",
+            "passed": true,
+            "guard": "G5",
+            "detail": "ceiling is the strictest user-signed limit: 200000 paise; charge is within it"
+          },
+          {
+            "check": "risk.attested",
+            "passed": true,
+            "guard": "G3",
+            "detail": "attested by 'trusted_surface': risk=low, step_up_completed=False, method=none"
+          }
+        ],
         "detail": {
           "user_goal": "buy running shoes",
           "purchased": [

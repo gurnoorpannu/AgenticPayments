@@ -23,6 +23,9 @@ class AttackResult:
     order_id: Optional[str] = None
     order_provenance: Optional[str] = None
     agent_kind: Optional[str] = None
+    #: The verifier's full named check pipeline, so a UI can show WHERE a
+    #: run stopped -- or, in vulnerable mode, that nothing stopped it.
+    checks: list[dict[str, Any]] = field(default_factory=list)
     detail: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -36,8 +39,14 @@ class AttackResult:
             "order_id": self.order_id,
             "order_provenance": self.order_provenance,
             "agent_kind": self.agent_kind,
+            "checks": self.checks,
             "detail": self.detail,
         }
+
+
+def checks_of(outcome) -> list[dict[str, Any]]:
+    """Flatten a VerificationOutcome's named checks for transport to a UI."""
+    return [c.model_dump() for c in outcome.checks]
 
 
 def mode_of(mode: Mode | str) -> str:

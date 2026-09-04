@@ -33,7 +33,7 @@ from typing import Optional
 
 from agent.session import ShoppingSession
 from agent.shopping_agent import DeterministicAgent
-from attacks import AttackResult, mode_of
+from attacks import AttackResult, checks_of, mode_of
 from catalog.service import CatalogService
 from config import Mode, Settings, get_settings
 from mandates.schemas import UserIntent
@@ -99,6 +99,7 @@ def consent_poisoning(
         order_id=result.order.order_id if result.order else None,
         order_provenance=result.order.provenance if result.order else None,
         agent_kind=agent.agent_kind,
+        checks=checks_of(result.outcome),
         detail={
             "user_stated_budget_paise": intent.budget_paise,
             "agent_proposed_cap_paise": proposal.max_amount_paise,
@@ -149,6 +150,7 @@ def claimed_constraints(mode: Mode, settings: Optional[Settings] = None) -> Atta
         order_id=result.order.order_id if result.order else None,
         order_provenance=result.order.provenance if result.order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(result.outcome),
         detail={
             "user_signed_cap_paise": session.checkout_constraints.max_amount_paise,
             "agent_asserted_cap_paise": session.cart.total_paise,

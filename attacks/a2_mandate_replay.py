@@ -16,7 +16,7 @@ import time
 from typing import Optional
 
 from agent.session import ShoppingSession
-from attacks import AttackResult, mode_of
+from attacks import AttackResult, checks_of, mode_of
 from config import Mode, Settings, get_settings
 from mandates.schemas import UserIntent
 
@@ -74,6 +74,7 @@ def replay_immediate(mode: Mode, settings: Optional[Settings] = None) -> AttackR
         order_id=second.order.order_id if second.order else None,
         order_provenance=second.order.provenance if second.order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(second.outcome),
         detail={
             "first_order_id": first.order.order_id,
             "second_order_id": second.order.order_id if second.order else None,
@@ -119,6 +120,7 @@ def replay_after_delay(mode: Mode, settings: Optional[Settings] = None,
         order_id=second.order.order_id if second.order else None,
         order_provenance=second.order.provenance if second.order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(second.outcome),
         detail={"delay_seconds": delay_seconds, "failed_check": second.outcome.reason},
     )
 
@@ -177,6 +179,7 @@ def replay_expired(mode: Mode, settings: Optional[Settings] = None) -> AttackRes
         order_id=result.order.order_id if result.order else None,
         order_provenance=result.order.provenance if result.order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(result.outcome),
         detail={"expires_at": stale_expiry, "failed_check": result.outcome.reason},
     )
 
@@ -238,6 +241,7 @@ def cross_verifier_replay(mode: Mode, settings: Optional[Settings] = None) -> At
         order_id=order.order_id if order else None,
         order_provenance=order.provenance if order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(outcome),
         detail={
             "first_order_id": first.order.order_id,
             "replica_order_id": order.order_id if order else None,

@@ -3,222 +3,499 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MandateGuard</title>
+<title>MandateGuard — adversarial testing for agentic payments</title>
 <style>
-  :root{
-    --bg:#0e1116; --panel:#161b22; --line:#272e38; --ink:#e6edf3; --dim:#8b949e;
-    --red:#f85149; --green:#3fb950; --amber:#d29922; --cyan:#58a6ff;
-    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
-  .wrap{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
-  h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
-  .tag{color:var(--dim);font-size:14px;margin:0 0 4px}
-  .thesis{border-left:3px solid var(--cyan);padding:10px 0 10px 16px;margin:24px 0;color:var(--dim)}
-  .thesis b{color:var(--ink);font-weight:600}
-  .env{font-family:var(--mono);font-size:12px;color:var(--dim);margin:16px 0 28px}
-  .env span{display:inline-block;border:1px solid var(--line);border-radius:4px;
-            padding:3px 8px;margin-right:6px}
-  .live{color:var(--green);border-color:#1c3a24!important}
-  .sim{color:var(--amber);border-color:#3d3115!important}
-  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:24px}
-  select,button{font:inherit;background:var(--panel);color:var(--ink);
-                border:1px solid var(--line);border-radius:6px;padding:9px 14px}
-  button{cursor:pointer;font-weight:600}
-  button:hover:not(:disabled){border-color:var(--cyan)}
-  button:disabled{opacity:.5;cursor:default}
-  .primary{background:#1f6feb;border-color:#1f6feb}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:820px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-  .card.exploited{border-color:var(--red)}
-  .card.blocked{border-color:var(--green)}
-  .card h2{margin:0;padding:12px 16px;font-size:12px;letter-spacing:.08em;
-           text-transform:uppercase;border-bottom:1px solid var(--line);font-family:var(--mono)}
-  .exploited h2{background:rgba(248,81,73,.12);color:var(--red)}
-  .blocked h2{background:rgba(63,185,80,.12);color:var(--green)}
-  .card .body{padding:16px}
-  table.kv{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
-  table.kv td{padding:4px 0;vertical-align:top}
-  table.kv td:last-child{text-align:right;white-space:nowrap;padding-left:12px}
-  .bad{color:var(--red);font-weight:700}
-  .good{color:var(--green);font-weight:700}
-  .quote{border-left:2px solid var(--amber);color:var(--amber);
-         padding:8px 0 8px 12px;margin:14px 0;font-size:12.5px}
-  .ev{color:var(--dim);font-size:12.5px;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
-  .order{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:10px}
-  .verdict{margin-top:16px;padding:14px 18px;border-radius:8px;
-           background:rgba(63,185,80,.08);border:1px solid #1c3a24;color:var(--green)}
-  .verdict.none{background:rgba(210,153,34,.08);border-color:#3d3115;color:var(--amber)}
-  h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;
-     color:var(--dim);margin:40px 0 12px;font-family:var(--mono)}
-  table.score{width:100%;border-collapse:collapse;font-size:13px}
-  table.score th{text-align:left;font-family:var(--mono);font-size:11px;
-                 text-transform:uppercase;letter-spacing:.06em;color:var(--dim);
-                 padding:8px 10px;border-bottom:1px solid var(--line)}
-  table.score td{padding:8px 10px;border-bottom:1px solid #1b2028;font-family:var(--mono);font-size:12px}
-  .pill{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
-  .pill.e{background:rgba(248,81,73,.15);color:var(--red)}
-  .pill.b{background:rgba(63,185,80,.15);color:var(--green)}
-  .pill.m{background:rgba(210,153,34,.15);color:var(--amber)}
-  .totals{margin-top:14px;font-family:var(--mono);font-size:13px}
-  .foot{margin-top:48px;color:var(--dim);font-size:12px;border-top:1px solid var(--line);padding-top:20px}
-  a{color:var(--cyan)}
+:root{
+  --bg:#08090c; --bg2:#0c0e13; --panel:#11141b; --panel2:#151922;
+  --line:#1f2530; --line2:#2a323f;
+  --ink:#e8edf5; --dim:#8d97a8; --dim2:#606b7d;
+  --red:#ff5f56; --red-bg:rgba(255,95,86,.09); --red-line:rgba(255,95,86,.32);
+  --grn:#3fdd7e; --grn-bg:rgba(63,221,126,.08); --grn-line:rgba(63,221,126,.30);
+  --amb:#f0b429; --amb-bg:rgba(240,180,41,.08); --amb-line:rgba(240,180,41,.30);
+  --blu:#5b9dff; --vio:#a78bfa;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:
+   radial-gradient(1100px 620px at 12% -12%,rgba(91,157,255,.09),transparent 62%),
+   radial-gradient(900px 520px at 92% 4%,rgba(167,139,250,.07),transparent 60%),
+   var(--bg);
+  color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+/* ---------- reveal ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes sweep{from{background-position:-160% 0}to{background-position:260% 0}}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.rise{animation:rise .5s var(--ease) both}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+
+/* ---------- topbar ---------- */
+.topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(14px);
+  background:rgba(8,9,12,.82);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:18px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:640;letter-spacing:-.015em;font-size:15.5px}
+.mark{width:22px;height:22px;border-radius:6px;flex:none;
+  background:linear-gradient(140deg,var(--blu),var(--vio));position:relative}
+.mark::after{content:"";position:absolute;inset:6px 6px 5px;border-radius:2px;
+  border:1.6px solid rgba(8,9,12,.9);border-top-color:transparent}
+.chips{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.01em;
+  border:1px solid var(--line2);border-radius:999px;padding:4px 11px;color:var(--dim)}
+.chip.on{color:var(--grn);border-color:var(--grn-line);background:var(--grn-bg)}
+.chip.off{color:var(--amb);border-color:var(--amb-line);background:var(--amb-bg)}
+.chip .dot{display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:currentColor;margin-right:6px;vertical-align:1px;animation:pulse 2.4s infinite}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 8px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--blu);margin-bottom:16px}
+h1{font-size:clamp(30px,4.6vw,50px);line-height:1.08;letter-spacing:-.032em;margin:0 0 18px;font-weight:680}
+h1 .g{background:linear-gradient(100deg,var(--blu),var(--vio));-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.lede{font-size:17.5px;color:var(--dim);max-width:660px;margin:0 0 30px}
+.thesis{position:relative;max-width:820px;padding:20px 24px 20px 26px;border-radius:12px;
+  background:linear-gradient(180deg,var(--panel),rgba(17,20,27,.4));border:1px solid var(--line);
+  font-size:16px;color:var(--dim);overflow:hidden}
+.thesis::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--blu),var(--vio))}
+.thesis b{color:var(--ink);font-weight:620}
+
+/* ---------- flow strip ---------- */
+.flow{display:flex;align-items:stretch;gap:0;margin:34px 0 0;flex-wrap:wrap}
+.fstep{flex:1 1 150px;min-width:150px;padding:14px 16px;border:1px solid var(--line);
+  background:var(--panel);position:relative}
+.fstep:first-child{border-radius:10px 0 0 10px}
+.fstep:last-child{border-radius:0 10px 10px 0}
+.fstep+.fstep{border-left:none}
+.fstep .n{font-family:var(--mono);font-size:10.5px;color:var(--dim2);letter-spacing:.1em}
+.fstep .t{font-size:13px;margin-top:5px;color:var(--dim)}
+.fstep.hot{background:linear-gradient(180deg,rgba(255,95,86,.13),rgba(255,95,86,.04));
+  border-color:var(--red-line);z-index:1}
+.fstep.hot .t{color:#ffb4ae;font-weight:600}
+.fstep.hot .n{color:var(--red)}
+.fstep.safe{background:var(--grn-bg);border-color:var(--grn-line);z-index:1}
+.fstep.safe .t{color:#8ff0b4;font-weight:600}
+
+/* ---------- sections ---------- */
+section{padding:52px 0}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.shead h2{font-size:12px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim2);margin:0;font-weight:600}
+.shead .rule{flex:1;height:1px;background:var(--line)}
+.sdesc{color:var(--dim);font-size:14.5px;margin:0 0 24px;max-width:720px}
+
+/* ---------- attack picker ---------- */
+.fam{margin-bottom:22px}
+.famhead{font-family:var(--mono);font-size:11px;color:var(--dim2);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:10px}
+.acard{text-align:left;cursor:pointer;background:var(--panel);border:1px solid var(--line);
+  border-radius:11px;padding:14px 16px;color:var(--ink);font:inherit;
+  transition:border-color .18s,background .18s,transform .18s var(--ease)}
+.acard:hover{border-color:var(--line2);background:var(--panel2);transform:translateY(-2px)}
+.acard[aria-pressed="true"]{border-color:var(--blu);
+  background:linear-gradient(180deg,rgba(91,157,255,.13),rgba(91,157,255,.04));
+  box-shadow:0 0 0 1px rgba(91,157,255,.28)}
+.acard .an{font-size:14px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px}
+.acard .ad{font-size:12.5px;color:var(--dim);line-height:1.5}
+.acard .at{font-family:var(--mono);font-size:10.5px;color:var(--dim2);margin-top:8px}
+.acard.gap[aria-pressed="true"]{border-color:var(--amb);
+  background:linear-gradient(180deg,rgba(240,180,41,.13),rgba(240,180,41,.04));
+  box-shadow:0 0 0 1px rgba(240,180,41,.26)}
+.acard .flag{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+  padding:2px 7px;border-radius:999px;background:var(--amb-bg);color:var(--amb);
+  border:1px solid var(--amb-line);margin-left:7px;vertical-align:1px}
+
+/* ---------- actions ---------- */
+.actions{display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin-top:26px}
+button.btn{font:inherit;font-weight:600;font-size:14px;cursor:pointer;border-radius:9px;
+  padding:11px 20px;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);
+  transition:.18s var(--ease);position:relative;overflow:hidden}
+button.btn:hover:not(:disabled){border-color:var(--dim2);transform:translateY(-1px)}
+button.btn:disabled{opacity:.6;cursor:progress}
+button.pri{background:linear-gradient(180deg,#3f86ff,#2f6fe0);border-color:#3f86ff;color:#fff;
+  box-shadow:0 6px 18px -8px rgba(63,134,255,.75)}
+button.pri:hover:not(:disabled){box-shadow:0 8px 24px -8px rgba(63,134,255,.9)}
+button.btn.busy::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.20),transparent 80%);
+  background-size:220% 100%;animation:sweep 1.15s linear infinite}
+.hint{font-size:12.5px;color:var(--dim2);font-family:var(--mono)}
+
+/* ---------- result panels ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.pane{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--panel)}
+.pane.bad{border-color:var(--red-line);box-shadow:0 0 0 1px rgba(255,95,86,.10),0 24px 60px -34px rgba(255,95,86,.5)}
+.pane.good{border-color:var(--grn-line);box-shadow:0 0 0 1px rgba(63,221,126,.10),0 24px 60px -34px rgba(63,221,126,.42)}
+.phead{display:flex;align-items:center;gap:10px;padding:13px 18px;font-family:var(--mono);
+  font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.bad .phead{background:var(--red-bg);color:var(--red)}
+.good .phead{background:var(--grn-bg);color:var(--grn)}
+.phead .verdict{margin-left:auto;font-weight:700;letter-spacing:.06em}
+.icon{width:16px;height:16px;flex:none}
+.pbody{padding:18px}
+
+/* numbers */
+.nums{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+.nrow{display:flex;align-items:baseline;gap:12px;padding:6px 0;font-family:var(--mono);font-size:13px}
+.nrow .k{color:var(--dim);flex:1;font-size:12.5px}
+.nrow .v{font-variant-numeric:tabular-nums;font-weight:600}
+.nrow.hi .k{color:var(--ink)}
+.bad .nrow.hi .v{color:var(--red);font-size:15px}
+.good .nrow.hi .v{color:var(--grn);font-size:15px}
+.bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;border-radius:3px;transform-origin:left;animation:grow .75s var(--ease) both}
+.bar i.base{background:linear-gradient(90deg,#39507a,#4b6ea8)}
+.bar i.over{background:linear-gradient(90deg,#ff5f56,#ff8a7a)}
+.delta{margin-top:12px;font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:8px;
+  background:var(--red-bg);border:1px solid var(--red-line);color:#ffb4ae}
+.delta.ok{background:var(--grn-bg);border-color:var(--grn-line);color:#8ff0b4}
+
+/* quote */
+.quote{margin:14px 0 0;padding:11px 14px;border-radius:8px;font-size:12.5px;line-height:1.55;
+  background:var(--amb-bg);border:1px solid var(--amb-line);color:#ffd98a}
+.quote .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--amb);margin-bottom:5px}
+
+/* pipeline */
+.pipe{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.pipe .ph{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.pipe .ph .cnt{margin-left:auto;color:var(--dim)}
+.chk{display:flex;align-items:flex-start;gap:9px;padding:3.5px 0;font-family:var(--mono);font-size:11.5px;
+  animation:rise .34s var(--ease) both}
+.chk .g{width:15px;height:15px;border-radius:50%;flex:none;margin-top:1px;
+  display:grid;place-items:center;font-size:9px;font-weight:800}
+.chk.ok .g{background:var(--grn-bg);color:var(--grn);border:1px solid var(--grn-line)}
+.chk.no .g{background:var(--red-bg);color:var(--red);border:1px solid var(--red-line)}
+.chk .nm{color:var(--dim);flex:1;word-break:break-word}
+.chk.no .nm{color:#ffb4ae;font-weight:600}
+.chk .gd{color:var(--dim2);font-size:10.5px;flex:none}
+.stopline{margin-top:9px;padding:8px 11px;border-radius:7px;font-family:var(--mono);font-size:11px;
+  background:var(--grn-bg);border:1px solid var(--grn-line);color:#8ff0b4;animation:rise .4s var(--ease) both}
+.allpass{margin-top:9px;padding:9px 11px;border-radius:7px;font-family:var(--mono);font-size:11px;
+  background:var(--red-bg);border:1px solid var(--red-line);color:#ffb4ae;animation:rise .4s var(--ease) both}
+
+.ev{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--dim);line-height:1.6}
+.order{margin-top:11px;font-family:var(--mono);font-size:11.5px;color:var(--dim2);
+  padding:8px 11px;border-radius:7px;background:var(--bg2);border:1px solid var(--line)}
+.order b{color:var(--ink);font-weight:600}
+
+/* verdict banner */
+.banner{margin-top:18px;border-radius:12px;padding:18px 22px;font-size:15px;
+  background:linear-gradient(100deg,rgba(63,221,126,.11),rgba(63,221,126,.03));
+  border:1px solid var(--grn-line);color:#a8f5c6;animation:rise .5s .12s var(--ease) both}
+.banner.warn{background:linear-gradient(100deg,rgba(240,180,41,.11),rgba(240,180,41,.03));
+  border-color:var(--amb-line);color:#ffdf9e}
+.banner b{color:#fff;font-weight:660}
+
+/* ---------- scorecard ---------- */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;margin-bottom:22px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.stat .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim2)}
+.stat .big{font-size:30px;font-weight:680;letter-spacing:-.03em;margin-top:6px;font-variant-numeric:tabular-nums}
+.stat.g .big{color:var(--grn)} .stat.a .big{color:var(--amb)} .stat.r .big{color:var(--red)}
+.stat .sub{font-size:12px;color:var(--dim2);margin-top:2px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+table.score{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+table.score th{text-align:left;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--dim2);padding:11px 16px;border-bottom:1px solid var(--line);
+  background:var(--bg2);position:sticky;top:0}
+table.score td{padding:10px 16px;border-bottom:1px solid #161a22;font-family:var(--mono);font-size:12px;color:var(--dim)}
+table.score tr:last-child td{border-bottom:none}
+table.score tbody tr{animation:fade .34s var(--ease) both}
+table.score tbody tr:hover{background:var(--panel2)}
+table.score td.sc{color:var(--ink)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:10.5px;font-weight:700;
+  letter-spacing:.05em;font-family:var(--mono)}
+.pill.e{background:var(--red-bg);color:var(--red);border:1px solid var(--red-line)}
+.pill.b{background:var(--grn-bg);color:var(--grn);border:1px solid var(--grn-line)}
+.pill.m{background:var(--amb-bg);color:var(--amb);border:1px solid var(--amb-line)}
+.gtag{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 0 60px;color:var(--dim2);font-size:12.5px}
+footer a{color:var(--blu);text-decoration:none} footer a:hover{text-decoration:underline}
+.skel{height:160px;border-radius:14px;border:1px solid var(--line);background:
+  linear-gradient(100deg,var(--panel) 25%,var(--panel2) 45%,var(--panel) 65%);
+  background-size:220% 100%;animation:sweep 1.25s linear infinite}
 </style>
 </head>
 <body>
+
+<div class="topbar"><div class="wrap">
+  <div class="brand"><span class="mark"></span> MandateGuard</div>
+  <div class="chips" id="chips"><span class="chip">connecting…</span></div>
+</div></div>
+
 <div class="wrap">
-  <h1>MandateGuard</h1>
-  <p class="tag">Adversarial testing layer for agentic payments — AP2 / UAP-style signed mandates</p>
 
-  <div class="thesis">
-    A valid signature proves <b>someone signed something</b>. It does not prove the
-    <b>content</b> being signed reflects what the user actually wanted. Everything
-    upstream of signing — catalog data, tool results, inter-agent messages — is
-    unsigned and manipulable.
-  </div>
+  <section class="hero">
+    <div class="eyebrow rise">Adversarial testing for agentic payments</div>
+    <h1 class="rise" style="animation-delay:.05s">A valid signature proves someone signed something.<br>
+      <span class="g">It does not prove they meant it.</span></h1>
+    <p class="lede rise" style="animation-delay:.1s">
+      AP2 and UAP secure agent-initiated purchases with signed mandates. Everything
+      <em>upstream</em> of the signature — catalog data, tool results, the approval screen — is
+      unsigned and manipulable. An attacker never forges a signature. They poison the context
+      that decides what gets signed.
+    </p>
+    <div class="thesis rise" style="animation-delay:.15s">
+      In the attack below, <b>every signature verifies and every downstream check passes.</b>
+      There is no failed check to report, because nothing downstream is wrong — the closed
+      mandate genuinely does fall inside the ceiling the user signed. The lie is in the premise,
+      which is why verification alone structurally cannot catch it.
+    </div>
 
-  <div class="env" id="env">loading environment…</div>
+    <div class="flow rise" style="animation-delay:.2s">
+      <div class="fstep"><div class="n">01</div><div class="t">User states a budget</div></div>
+      <div class="fstep hot"><div class="n">02 · POISONED</div><div class="t">Agent reads catalog, proposes a ceiling</div></div>
+      <div class="fstep hot"><div class="n">03 · POISONED</div><div class="t">Approval screen shows the user's own number</div></div>
+      <div class="fstep"><div class="n">04</div><div class="t">User signs an inflated ceiling</div></div>
+      <div class="fstep"><div class="n">05</div><div class="t">Every check passes honestly</div></div>
+      <div class="fstep"><div class="n">06</div><div class="t">Money moves</div></div>
+    </div>
+  </section>
 
-  <div class="controls">
-    <select id="scenario"></select>
-    <button class="primary" id="run">Run both modes</button>
-    <button id="score">Full scorecard</button>
-  </div>
+  <section>
+    <div class="shead"><h2>Choose an attack</h2><div class="rule"></div></div>
+    <p class="sdesc">Each scenario runs twice against the same code. <code>MODE=vulnerable</code>
+      and <code>MODE=guarded</code> differ by one config flag — the guard is middleware that is
+      either engaged or bypassed.</p>
+    <div id="picker"></div>
+    <div class="actions">
+      <button class="btn pri" id="run">Run both modes</button>
+      <button class="btn" id="score">Generate full scorecard</button>
+      <span class="hint" id="hint"></span>
+    </div>
+  </section>
 
-  <div id="out"></div>
-  <div id="scoreout"></div>
+  <section id="stageSec" hidden>
+    <div class="shead"><h2 id="stageTitle">Result</h2><div class="rule"></div></div>
+    <div id="stage"></div>
+  </section>
 
-  <div class="foot">
+  <section id="scoreSec" hidden>
+    <div class="shead"><h2>Scorecard</h2><div class="rule"></div></div>
+    <p class="sdesc">Every figure is produced by an actual run. Successful attacks in vulnerable
+      mode create real Razorpay test-mode orders.</p>
+    <div id="scoreout"></div>
+  </section>
+
+  <footer>
     Threat taxonomy from Aviv, Gandhi, Bitton &amp; Shabtai,
-    <em>“Beyond the Mandate: A Systematic Security Analysis of the Agent Payments
-    Protocol (AP2)”</em>, arXiv:2608.23858.
-    Payments are Razorpay <strong>test mode</strong> only.
-  </div>
+    <a href="https://arxiv.org/abs/2608.23858" target="_blank" rel="noopener">“Beyond the Mandate:
+    A Systematic Security Analysis of the Agent Payments Protocol (AP2)”</a>, arXiv:2608.23858.
+    Payments are Razorpay <strong>test mode</strong> only — no live keys, no real money.
+  </footer>
 </div>
 
 <script>
-const LABELS = {
-  consent_poisoning:"Catalog injection — consent-capture poisoning (AM1)",
-  consent_poisoning_indirect:"Catalog injection — indirect phrasing (AM1)",
-  claimed_constraints:"Catalog injection — claimed constraints (SR3, simplified)",
-  replay_immediate:"Mandate replay — immediate",
-  replay_delayed:"Mandate replay — after delay",
-  replay_expired:"Mandate replay — expired mandate",
-  cross_verifier_replay:"Mandate replay — second verifier replica",
-  risk_spoof_step_up:"risk_data spoof — step-up falsely claimed",
-  risk_spoof_low_score:"risk_data spoof — low score only",
-  risk_wrong_signer:"Risk attestation — signed by the wrong key",
-  merchant_typosquat:"Merchant substitution — typo-squat (1 for l)",
-  merchant_homoglyph:"Merchant substitution — Cyrillic homoglyph",
-  merchant_case:"Merchant substitution — case variation",
-  merchant_suffix:"Merchant substitution — suffix extension",
-  gap_rendered_vs_signed:"KNOWN GAP — rendered vs signed cart",
-  gap_compromised_key:"KNOWN GAP — compromised agent key",
+const META = {
+  consent_poisoning:{n:"Consent-capture poisoning",f:"F1 · Semantic manipulation",t:"T-1 (AM1)",
+    d:"Catalog text shapes the ceiling before the user approves. They see 200,000 and sign 249,900."},
+  consent_poisoning_indirect:{n:"Indirect phrasing",f:"F1 · Semantic manipulation",t:"T-1 (AM1)",
+    d:"Same attack, injection worded as advice to automated purchasing assistants."},
+  claimed_constraints:{n:"Claimed constraints",f:"F1 · Semantic manipulation",t:"T-1 via SR3",
+    d:"Agent asserts a widened scope; the naive verifier trusts it. Simplified model — see README.",s:1},
+  replay_immediate:{n:"Replay, immediate",f:"F4 · State-binding failures",t:"T-31",
+    d:"Resubmit a validly signed mandate. Nothing is forged; it has simply been used already."},
+  replay_delayed:{n:"Replay, after delay",f:"F4 · State-binding failures",t:"T-31",
+    d:"Confirms the block is single-use enforcement, not a narrow race window."},
+  replay_expired:{n:"Replay, expired mandate",f:"F4 · State-binding failures",t:"T-31",
+    d:"Separates freshness from single-use: an hour-stale mandate on first presentation."},
+  cross_verifier_replay:{n:"Replay across replicas",f:"F4 · State-binding failures",t:"T-31",
+    d:"Second verifier instance, own guard. Was a declared miss until the nonce store was shared."},
+  risk_spoof_step_up:{n:"Step-up falsely claimed",f:"F4 · State-binding failures",t:"T-34",
+    d:"Agent asserts step_up_completed: true for a challenge that never happened."},
+  risk_spoof_low_score:{n:"Low risk score asserted",f:"F4 · State-binding failures",t:"T-34",
+    d:"Weaker forgery: claims low risk without claiming a completed challenge."},
+  risk_wrong_signer:{n:"Attestation, wrong signer",f:"F4 · State-binding failures",t:"T-34",
+    d:"Correctly shaped attestation claiming trusted_surface, signed with the agent key."},
+  merchant_typosquat:{n:"Typo-squat (1 for l)",f:"F3 · Trust-root subversion",t:"T-27",
+    d:"merchant_a1pha for merchant_alpha. Fuzzy matching says yes to the wrong string."},
+  merchant_homoglyph:{n:"Unicode homoglyph",f:"F3 · Trust-root subversion",t:"T-27",
+    d:"Cyrillic а (U+0430) for Latin a. Visually identical, different codepoint."},
+  merchant_case:{n:"Case variation",f:"F3 · Trust-root subversion",t:"T-27",
+    d:"Merchant_Alpha. Casefolding erases the difference."},
+  merchant_suffix:{n:"Suffix extension",f:"F3 · Trust-root subversion",t:"T-27",
+    d:"merchant_alpha_payouts. Substring matching accepts it."},
+  gap_rendered_vs_signed:{n:"Rendered vs signed cart",f:"Declared gaps",t:"T-7",
+    d:"The cart reviewed is not the cart signed. We do not block this — nothing recorded what the human saw.",g:1},
+  gap_compromised_key:{n:"Compromised agent key",f:"Declared gaps",t:"key compromise",
+    d:"In-scope spending the user never asked for. No content layer can catch this.",g:1},
 };
-const paise = n => (n||0).toLocaleString("en-IN") + " paise";
-const el = (h) => { const d=document.createElement("div"); d.innerHTML=h.trim(); return d.firstChild; };
+const ORDER = Object.keys(META);
+const FAMS = ["F1 · Semantic manipulation","F4 · State-binding failures","F3 · Trust-root subversion","Declared gaps"];
+
+const $ = s => document.querySelector(s);
+const el = h => { const d=document.createElement("div"); d.innerHTML=h.trim(); return d.firstElementChild; };
+const paise = n => (n||0).toLocaleString("en-IN");
+let current = "consent_poisoning";
+
+const TICK = '<svg class="icon" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5l-7 7L3 8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CROSS = '<svg class="icon" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>';
 
 async function boot(){
   const cfg = await (await fetch("/api/config")).json();
-  document.getElementById("env").innerHTML =
-    `<span class="${cfg.razorpay_live?'live':'sim'}">razorpay: ${cfg.razorpay}</span>` +
-    `<span class="${cfg.llm_live?'live':'sim'}">llm: ${cfg.llm}</span>` +
-    `<span>default mode: ${cfg.mode}</span>`;
-  const sel = document.getElementById("scenario");
-  // Present in narrative order (headline attack first), not alphabetically.
-  const ordered = Object.keys(LABELS).filter(k => cfg.scenarios.includes(k))
-    .concat(cfg.scenarios.filter(k => !(k in LABELS)));
-  ordered.forEach(s => {
-    const o=document.createElement("option"); o.value=s; o.textContent=LABELS[s]||s; sel.appendChild(o);
-  });
-}
-
-function card(entry, mode){
-  const ok = !entry.succeeded;
-  const cls = ok ? "blocked" : "exploited";
-  const head = ok ? `MODE=${mode} → BLOCKED${entry.guard_that_blocked?" by "+entry.guard_that_blocked:""}`
-                  : `MODE=${mode} → EXPLOITED`;
-  const d = entry.detail || {};
-  let kv = "";
-  const row = (k,v,c="") => `<tr><td>${k}</td><td class="${c}">${v}</td></tr>`;
-  if ("user_stated_budget_paise" in d){
-    kv += row("user stated budget", paise(d.user_stated_budget_paise));
-    kv += row("approval screen showed", paise(d.displayed_cap_paise));
-    kv += row("mandate actually signed", paise(d.signed_cap_paise), d.consent_faithful?"good":"bad");
-    kv += row("cart charged", paise(d.cart_total_paise));
-  } else if ("first_order_id" in d){
-    kv += row("authorisations signed", d.authorisations_signed ?? 1);
-    kv += row("orders created", d.orders_created ?? (d.replica_order_id?2:1),
-              (d.orders_created>1||d.replica_order_id)?"bad":"good");
-  } else if ("actual_payee" in d){
-    kv += row("allowlisted merchant", d.allowlisted_merchant);
-    kv += row("actual payee", d.actual_payee, "bad");
-  } else if ("step_up_threshold_paise" in d){
-    kv += row("amount", paise(d.amount_paise));
-    kv += row("step-up threshold", paise(d.step_up_threshold_paise));
-    kv += row("step-up performed", "no", "bad");
-  } else if ("reviewed_total_paise" in d){
-    kv += row("user reviewed", paise(d.reviewed_total_paise));
-    kv += row("actually signed", paise(d.signed_total_paise), "bad");
+  $("#chips").innerHTML =
+    `<span class="chip ${cfg.razorpay_live?'on':'off'}"><span class="dot"></span>razorpay · ${cfg.razorpay}</span>`+
+    `<span class="chip ${cfg.llm_live?'on':'off'}"><span class="dot"></span>llm · ${cfg.llm}</span>`;
+  const avail = new Set(cfg.scenarios);
+  const pick = $("#picker");
+  for(const fam of FAMS){
+    const keys = ORDER.filter(k => META[k].f===fam && avail.has(k));
+    if(!keys.length) continue;
+    const group = el(`<div class="fam"><div class="famhead">${fam}</div><div class="cards"></div></div>`);
+    const row = group.querySelector(".cards");
+    for(const k of keys){
+      const m = META[k];
+      const b = el(`<button class="acard${m.g?' gap':''}" aria-pressed="${k===current}" data-k="${k}">
+        <div class="an">${m.n}${m.g?'<span class="flag">DECLARED GAP</span>':''}${m.s?'<span class="flag">SIMPLIFIED</span>':''}</div>
+        <div class="ad">${m.d}</div><div class="at">${m.t}</div></button>`);
+      b.onclick = () => {
+        current = k;
+        document.querySelectorAll(".acard").forEach(x => x.setAttribute("aria-pressed", x.dataset.k===k));
+      };
+      row.appendChild(b);
+    }
+    pick.appendChild(group);
   }
-  const quote = d.justification_forwarded_to_user
-    ? `<div class="quote">merchant text shown to the human:<br>“${d.justification_forwarded_to_user}”</div>` : "";
-  const why = d.why_not_caught ? `<div class="quote">why this is not caught: ${d.why_not_caught}</div>` : "";
-  const order = entry.order_id
-    ? `<div class="order">order ${entry.order_id} — ${entry.order_provenance}</div>` : "";
-  return el(`<div class="card ${cls}"><h2>${head}</h2><div class="body">
-      ${kv?`<table class="kv">${kv}</table>`:""}${quote}${why}
-      <div class="ev">${entry.evidence}</div>${order}</div></div>`);
 }
 
-document.getElementById("run").onclick = async (e) => {
-  const btn=e.target, name=document.getElementById("scenario").value;
-  btn.disabled=true; btn.textContent="Running…";
-  document.getElementById("scoreout").innerHTML="";
-  const out=document.getElementById("out"); out.innerHTML="";
+function numbers(entry, side){
+  const d = entry.detail || {}; let rows="", extra="";
+  const R = (k,v,hi) => `<div class="nrow${hi?' hi':''}"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  if("user_stated_budget_paise" in d){
+    const cap=d.user_stated_budget_paise, signed=d.signed_cap_paise, cart=d.cart_total_paise;
+    rows = R("user stated budget", paise(cap)+" paise")
+         + R("approval screen showed", paise(d.displayed_cap_paise)+" paise")
+         + R("mandate actually signed", paise(signed)+" paise", true)
+         + R("cart charged", paise(cart)+" paise");
+    const over = Math.max(0, signed-cap), pct = Math.min(100, cap/Math.max(signed,cap)*100);
+    extra = `<div class="bar"><i class="base" style="width:${pct}%"></i></div>`;
+    extra += d.consent_faithful
+      ? `<div class="delta ok">consent faithful — the user signed exactly what they were shown</div>`
+      : `<div class="delta">divergence: signed ${paise(over)} paise more than the user was shown</div>`;
+  } else if("first_order_id" in d || "replica_order_id" in d){
+    const orders = d.orders_created ?? (d.replica_order_id?2:1);
+    rows = R("authorisations signed", d.authorisations_signed ?? 1)
+         + R("orders created", orders, true);
+    extra = orders>1 ? `<div class="delta">one authorisation produced ${orders} charges</div>`
+                     : `<div class="delta ok">one authorisation, one charge</div>`;
+  } else if("actual_payee" in d){
+    rows = R("allowlisted merchant", d.allowlisted_merchant)
+         + R("actual payee", d.actual_payee, true);
+    extra = `<div class="delta${entry.succeeded?'':' ok'}">${d.confusion_class||""}</div>`;
+  } else if("step_up_threshold_paise" in d){
+    rows = R("amount", paise(d.amount_paise)+" paise")
+         + R("step-up threshold", paise(d.step_up_threshold_paise)+" paise")
+         + R("challenge performed", "no", true);
+    extra = `<div class="delta${entry.succeeded?'':' ok'}">${entry.succeeded
+      ? "charged without the challenge the amount required" : "step-up enforced"}</div>`;
+  } else if("reviewed_total_paise" in d){
+    rows = R("user reviewed", paise(d.reviewed_total_paise)+" paise")
+         + R("actually signed", paise(d.signed_total_paise)+" paise", true);
+    extra = `<div class="delta">+${paise(d.delta_paise)} paise, still inside every approved limit</div>`;
+  } else if("user_goal" in d){
+    rows = R("user asked for", d.user_goal) + R("agent purchased", (d.purchased||[]).join(", "), true);
+    extra = `<div class="delta">inside every constraint the user approved</div>`;
+  }
+  return `<div class="nums">${rows}</div>${extra}`;
+}
+
+function pipeline(entry){
+  const cs = entry.checks || [];
+  if(!cs.length) return "";
+  const failed = cs.find(c => !c.passed);
+  let items = cs.map((c,i) =>
+    `<div class="chk ${c.passed?'ok':'no'}" style="animation-delay:${i*38}ms">
+       <span class="g">${c.passed?TICK:CROSS}</span>
+       <span class="nm">${c.check}</span><span class="gd">${c.guard||""}</span></div>`).join("");
+  const tail = failed
+    ? `<div class="stopline" style="animation-delay:${cs.length*38+60}ms">stopped at <b>${failed.check}</b> — ${failed.guard||"guard"}</div>`
+    : `<div class="allpass" style="animation-delay:${cs.length*38+60}ms">all ${cs.length} checks passed — and the money still moved</div>`;
+  return `<div class="pipe"><div class="ph">verifier pipeline<span class="cnt">${cs.filter(c=>c.passed).length}/${cs.length} passed</span></div>${items}${tail}</div>`;
+}
+
+function pane(entry, mode){
+  const ok = !entry.succeeded, cls = ok?"good":"bad";
+  const verdict = ok ? (entry.guard_that_blocked ? "BLOCKED · "+entry.guard_that_blocked : "BLOCKED") : "EXPLOITED";
+  const d = entry.detail||{};
+  const quote = d.justification_forwarded_to_user
+    ? `<div class="quote"><span class="lbl">merchant text shown to the human</span>“${d.justification_forwarded_to_user}”</div>` : "";
+  const why = d.why_not_caught
+    ? `<div class="quote"><span class="lbl">why this is not caught</span>${d.why_not_caught}</div>` : "";
+  const order = entry.order_id
+    ? `<div class="order">order <b>${entry.order_id}</b> · ${entry.order_provenance}</div>` : "";
+  return `<div class="pane ${cls} rise">
+     <div class="phead">${ok?TICK:CROSS}<span>MODE = ${mode}</span><span class="verdict">${verdict}</span></div>
+     <div class="pbody">${numbers(entry,mode)}${quote}${why}${pipeline(entry)}
+       <div class="ev">${entry.evidence}</div>${order}</div></div>`;
+}
+
+$("#run").onclick = async e => {
+  const btn=e.target; btn.disabled=true; btn.classList.add("busy");
+  const label=btn.textContent; btn.textContent="Running both modes…";
+  $("#scoreSec").hidden=true;
+  $("#stageSec").hidden=false;
+  $("#stageTitle").textContent = META[current].n;
+  $("#stage").innerHTML = `<div class="grid"><div class="skel"></div><div class="skel"></div></div>`;
+  $("#stageSec").scrollIntoView({block:"start"});
   try{
-    const r = await (await fetch(`/api/contrast/${name}`,{method:"POST"})).json();
-    const grid=el(`<div class="grid"></div>`);
-    grid.appendChild(card(r.vulnerable,"vulnerable"));
-    grid.appendChild(card(r.guarded,"guarded"));
-    out.appendChild(el(`<h3>${LABELS[name]||name}</h3>`));
-    out.appendChild(grid);
-    out.appendChild(el(r.blocked
-      ? `<div class="verdict">Same code. Same agent. Same poisoned catalog. The only
-         difference is one config flag: <strong>MODE</strong>. Blocked by
-         <strong>${r.guard}</strong>.</div>`
-      : `<div class="verdict none">This scenario is <strong>not blocked</strong> in guarded
-         mode. It is a declared gap — see the README.</div>`));
-  } finally { btn.disabled=false; btn.textContent="Run both modes"; }
+    const r = await (await fetch(`/api/contrast/${current}`,{method:"POST"})).json();
+    $("#stage").innerHTML =
+      `<div class="grid">${pane(r.vulnerable,"vulnerable")}${pane(r.guarded,"guarded")}</div>` +
+      (r.blocked
+        ? `<div class="banner">Same code. Same agent. Same poisoned catalog. The only difference is
+             one config flag: <b>MODE</b>. Blocked by <b>${r.guard}</b>.</div>`
+        : `<div class="banner warn">This scenario is <b>not blocked</b> in guarded mode. It is a
+             declared gap with no guard behind it — see “What we did not solve”.</div>`);
+  }catch(err){
+    $("#stage").innerHTML = `<div class="banner warn">Run failed: ${err}</div>`;
+  }finally{ btn.disabled=false; btn.classList.remove("busy"); btn.textContent=label; }
 };
 
-document.getElementById("score").onclick = async (e) => {
-  const btn=e.target; btn.disabled=true; btn.textContent="Running every scenario…";
-  document.getElementById("out").innerHTML="";
-  const out=document.getElementById("scoreout"); out.innerHTML="";
+$("#score").onclick = async e => {
+  const btn=e.target; btn.disabled=true; btn.classList.add("busy");
+  const label=btn.textContent; btn.textContent="Running 16 scenarios…";
+  $("#hint").textContent="each scenario runs in both modes — this takes a moment";
+  $("#stageSec").hidden=true; $("#scoreSec").hidden=false;
+  $("#scoreout").innerHTML=`<div class="skel" style="height:340px"></div>`;
+  $("#scoreSec").scrollIntoView({block:"start"});
   try{
     const rep = await (await fetch("/api/scorecard",{method:"POST"})).json();
-    let rows="";
-    for(const r of rep.results){
-      const v=`<span class="pill e">EXPLOITED</span>`;
-      const g=r.blocked?`<span class="pill b">BLOCKED</span>`:`<span class="pill m">MISSED</span>`;
-      rows+=`<tr><td>${r.scenario}</td><td>${v}</td><td>${g}</td>
-             <td>${r.actual_guard||(r.known_gap?"declared gap":"—")}</td>
-             <td>${r.threat_ref}</td></tr>`;
-    }
-    const t=rep.totals;
-    out.appendChild(el(`<h3>Scorecard</h3>`));
-    out.appendChild(el(`<table class="score"><thead><tr>
-       <th>Scenario</th><th>Vulnerable</th><th>Guarded</th><th>Guard</th><th>Threat</th>
-       </tr></thead><tbody>${rows}</tbody></table>
-       <div class="totals">BLOCKED ${t.blocked_in_guarded_mode}/${t.exploitable_in_vulnerable_mode} &nbsp;
-       MISSED ${t.missed_in_guarded_mode}/${t.exploitable_in_vulnerable_mode}<br>
-       <span style="color:var(--dim)">${t.claimed_blocked}/${t.claimed_coverage} of scenarios a guard
-       claims; ${t.declared_gaps} declared gaps with no guard behind them.</span></div>`));
-  } finally { btn.disabled=false; btn.textContent="Full scorecard"; }
+    const t = rep.totals;
+    const rows = rep.results.map((r,i) => `<tr style="animation-delay:${i*26}ms">
+        <td class="sc">${r.scenario}</td>
+        <td><span class="pill e">EXPLOITED</span></td>
+        <td><span class="pill ${r.blocked?'b':'m'}">${r.blocked?'BLOCKED':'MISSED'}</span></td>
+        <td class="gtag">${r.actual_guard || (r.known_gap?'declared gap':'—')}</td>
+        <td>${r.threat_ref}</td></tr>`).join("");
+    $("#scoreout").innerHTML = `
+      <div class="summary">
+        <div class="stat g"><div class="lab">Blocked</div><div class="big">${t.blocked_in_guarded_mode}/${t.exploitable_in_vulnerable_mode}</div><div class="sub">in guarded mode</div></div>
+        <div class="stat a"><div class="lab">Missed</div><div class="big">${t.missed_in_guarded_mode}/${t.exploitable_in_vulnerable_mode}</div><div class="sub">declared gaps</div></div>
+        <div class="stat r"><div class="lab">Exploitable</div><div class="big">${t.exploitable_in_vulnerable_mode}/${t.scenarios}</div><div class="sub">in vulnerable mode</div></div>
+        <div class="stat"><div class="lab">Guard claims</div><div class="big">${t.claimed_blocked}/${t.claimed_coverage}</div><div class="sub">where a guard claims coverage</div></div>
+      </div>
+      <div class="tablewrap"><table class="score"><thead><tr>
+        <th>Scenario</th><th>Vulnerable</th><th>Guarded</th><th>Guard</th><th>Threat</th>
+      </tr></thead><tbody>${rows}</tbody></table></div>`;
+  }catch(err){
+    $("#scoreout").innerHTML = `<div class="banner warn">Scorecard failed: ${err}</div>`;
+  }finally{ btn.disabled=false; btn.classList.remove("busy"); btn.textContent=label; $("#hint").textContent=""; }
 };
 
 boot();

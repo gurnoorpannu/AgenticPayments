@@ -18,7 +18,7 @@ from __future__ import annotations
 from typing import Optional
 
 from agent.session import ShoppingSession
-from attacks import AttackResult, mode_of
+from attacks import AttackResult, checks_of, mode_of
 from config import Mode, Settings, get_settings
 from mandates.schemas import UserIntent
 
@@ -72,6 +72,7 @@ def rendered_vs_signed_divergence(mode: Mode, settings: Optional[Settings] = Non
         order_id=result.order.order_id if result.order else None,
         order_provenance=result.order.provenance if result.order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(result.outcome),
         detail={
             "reviewed_total_paise": reviewed_total,
             "signed_total_paise": signed_total,
@@ -122,6 +123,7 @@ def compromised_agent_key(mode: Mode, settings: Optional[Settings] = None) -> At
         order_id=result.order.order_id if result.order else None,
         order_provenance=result.order.provenance if result.order else None,
         agent_kind="scripted (no LLM involved -- protocol-level)",
+        checks=checks_of(result.outcome),
         detail={
             "user_goal": session.intent.goal,
             "purchased": [i.name for i in session.cart.items],
