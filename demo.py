@@ -127,7 +127,8 @@ def show_purchase(settings) -> None:
 
     agent = build_agent(settings)
     session = ShoppingSession(settings=settings, mode=Mode.GUARDED)
-    console.print(f"\n[bold]Honest purchase[/bold]  agent={agent.agent_kind}  session={session.session_id}\n")
+    console.print(f"\n[bold]Agent-driven purchase[/bold]  agent={agent.agent_kind}"
+                  f"  mode=guarded  session={session.session_id}\n")
     with console.status("agent is shopping..."):
         run = agent.run(session)
 
@@ -135,11 +136,29 @@ def show_purchase(settings) -> None:
         console.print(f"  [cyan]{step.tool}[/cyan]({step.arguments}) ")
         console.print(f"    [dim]{step.result.strip().splitlines()[0][:110]}[/dim]")
 
-    table = Table(title="verifier checks", header_style="bold", show_lines=False)
-    table.add_column("check"); table.add_column("guard"); table.add_column("result")
     console.print()
+    if run.obeyed_injection:
+        console.print(Panel(
+            Text.from_markup(
+                "[yellow]This agent followed instructions embedded in the catalog[/yellow] and put an\n"
+                "out-of-scope item in the cart. That is by design: with no LLM configured the\n"
+                "deterministic stub is written to be maximally injectable, so it stands in for a\n"
+                "fully compromised model. The guard declined the checkout anyway -- which is the\n"
+                "property worth demonstrating.\n\n"
+                "[dim]Configure LLM_API_KEY to run this with a real model, which may resist the\n"
+                "injection on its own and complete the purchase normally.[/dim]"),
+            border_style="yellow", padding=(1, 2)))
+    else:
+        console.print(Panel(
+            Text.from_markup(
+                "[green]The agent ignored the poisoned listings[/green] and bought the item the user\n"
+                "asked for, within the approved ceiling."),
+            border_style="green", padding=(1, 2)))
+
     intact, chain_detail = session.guard.audit.verify_chain()
-    console.print(f"  audit chain: [{'green' if intact else 'red'}]{chain_detail}[/]")
+    console.print(f"\n  cart total:  {session.cart.total_paise:,} paise")
+    console.print(f"  user cap:    {session.checkout_constraints.max_amount_paise:,} paise")
+    console.print(f"  audit chain: [{'green' if intact else 'red'}]{chain_detail}[/]\n")
 
 
 def main() -> int:
