@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MandateGuard</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --line:#272e38; --ink:#e6edf3; --dim:#8b949e;
+    --red:#f85149; --green:#3fb950; --amber:#d29922; --cyan:#58a6ff;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+  .tag{color:var(--dim);font-size:14px;margin:0 0 4px}
+  .thesis{border-left:3px solid var(--cyan);padding:10px 0 10px 16px;margin:24px 0;color:var(--dim)}
+  .thesis b{color:var(--ink);font-weight:600}
+  .env{font-family:var(--mono);font-size:12px;color:var(--dim);margin:16px 0 28px}
+  .env span{display:inline-block;border:1px solid var(--line);border-radius:4px;
+            padding:3px 8px;margin-right:6px}
+  .live{color:var(--green);border-color:#1c3a24!important}
+  .sim{color:var(--amber);border-color:#3d3115!important}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:24px}
+  select,button{font:inherit;background:var(--panel);color:var(--ink);
+                border:1px solid var(--line);border-radius:6px;padding:9px 14px}
+  button{cursor:pointer;font-weight:600}
+  button:hover:not(:disabled){border-color:var(--cyan)}
+  button:disabled{opacity:.5;cursor:default}
+  .primary{background:#1f6feb;border-color:#1f6feb}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .card.exploited{border-color:var(--red)}
+  .card.blocked{border-color:var(--green)}
+  .card h2{margin:0;padding:12px 16px;font-size:12px;letter-spacing:.08em;
+           text-transform:uppercase;border-bottom:1px solid var(--line);font-family:var(--mono)}
+  .exploited h2{background:rgba(248,81,73,.12);color:var(--red)}
+  .blocked h2{background:rgba(63,185,80,.12);color:var(--green)}
+  .card .body{padding:16px}
+  table.kv{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
+  table.kv td{padding:4px 0;vertical-align:top}
+  table.kv td:last-child{text-align:right;white-space:nowrap;padding-left:12px}
+  .bad{color:var(--red);font-weight:700}
+  .good{color:var(--green);font-weight:700}
+  .quote{border-left:2px solid var(--amber);color:var(--amber);
+         padding:8px 0 8px 12px;margin:14px 0;font-size:12.5px}
+  .ev{color:var(--dim);font-size:12.5px;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .order{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:10px}
+  .verdict{margin-top:16px;padding:14px 18px;border-radius:8px;
+           background:rgba(63,185,80,.08);border:1px solid #1c3a24;color:var(--green)}
+  .verdict.none{background:rgba(210,153,34,.08);border-color:#3d3115;color:var(--amber)}
+  h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;
+     color:var(--dim);margin:40px 0 12px;font-family:var(--mono)}
+  table.score{width:100%;border-collapse:collapse;font-size:13px}
+  table.score th{text-align:left;font-family:var(--mono);font-size:11px;
+                 text-transform:uppercase;letter-spacing:.06em;color:var(--dim);
+                 padding:8px 10px;border-bottom:1px solid var(--line)}
+  table.score td{padding:8px 10px;border-bottom:1px solid #1b2028;font-family:var(--mono);font-size:12px}
+  .pill{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  .pill.e{background:rgba(248,81,73,.15);color:var(--red)}
+  .pill.b{background:rgba(63,185,80,.15);color:var(--green)}
+  .pill.m{background:rgba(210,153,34,.15);color:var(--amber)}
+  .totals{margin-top:14px;font-family:var(--mono);font-size:13px}
+  .foot{margin-top:48px;color:var(--dim);font-size:12px;border-top:1px solid var(--line);padding-top:20px}
+  a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MandateGuard</h1>
+  <p class="tag">Adversarial testing layer for agentic payments — AP2 / UAP-style signed mandates</p>
+
+  <div class="thesis">
+    A valid signature proves <b>someone signed something</b>. It does not prove the
+    <b>content</b> being signed reflects what the user actually wanted. Everything
+    upstream of signing — catalog data, tool results, inter-agent messages — is
+    unsigned and manipulable.
+  </div>
+
+  <div class="env" id="env">loading environment…</div>
+
+  <div class="controls">
+    <select id="scenario"></select>
+    <button class="primary" id="run">Run both modes</button>
+    <button id="score">Full scorecard</button>
+  </div>
+
+  <div id="out"></div>
+  <div id="scoreout"></div>
+
+  <div class="foot">
+    Threat taxonomy from Aviv, Gandhi, Bitton &amp; Shabtai,
+    <em>“Beyond the Mandate: A Systematic Security Analysis of the Agent Payments
+    Protocol (AP2)”</em>, arXiv:2608.23858.
+    Payments are Razorpay <strong>test mode</strong> only.
+  </div>
+</div>
+
+<script>
+const LABELS = {
+  consent_poisoning:"Catalog injection — consent-capture poisoning (AM1)",
+  consent_poisoning_indirect:"Catalog injection — indirect phrasing (AM1)",
+  claimed_constraints:"Catalog injection — claimed constraints (SR3, simplified)",
+  replay_immediate:"Mandate replay — immediate",
+  replay_delayed:"Mandate replay — after delay",
+  replay_expired:"Mandate replay — expired mandate",
+  cross_verifier_replay:"Mandate replay — second verifier replica",
+  risk_spoof_step_up:"risk_data spoof — step-up falsely claimed",
+  risk_spoof_low_score:"risk_data spoof — low score only",
+  risk_wrong_signer:"Risk attestation — signed by the wrong key",
+  merchant_typosquat:"Merchant substitution — typo-squat (1 for l)",
+  merchant_homoglyph:"Merchant substitution — Cyrillic homoglyph",
+  merchant_case:"Merchant substitution — case variation",
+  merchant_suffix:"Merchant substitution — suffix extension",
+  gap_rendered_vs_signed:"KNOWN GAP — rendered vs signed cart",
+  gap_compromised_key:"KNOWN GAP — compromised agent key",
+};
+const paise = n => (n||0).toLocaleString("en-IN") + " paise";
+const el = (h) => { const d=document.createElement("div"); d.innerHTML=h.trim(); return d.firstChild; };
+
+async function boot(){
+  const cfg = await (await fetch("/api/config")).json();
+  document.getElementById("env").innerHTML =
+    `<span class="${cfg.razorpay_live?'live':'sim'}">razorpay: ${cfg.razorpay}</span>` +
+    `<span class="${cfg.llm_live?'live':'sim'}">llm: ${cfg.llm}</span>` +
+    `<span>default mode: ${cfg.mode}</span>`;
+  const sel = document.getElementById("scenario");
+  // Present in narrative order (headline attack first), not alphabetically.
+  const ordered = Object.keys(LABELS).filter(k => cfg.scenarios.includes(k))
+    .concat(cfg.scenarios.filter(k => !(k in LABELS)));
+  ordered.forEach(s => {
+    const o=document.createElement("option"); o.value=s; o.textContent=LABELS[s]||s; sel.appendChild(o);
+  });
+}
+
+function card(entry, mode){
+  const ok = !entry.succeeded;
+  const cls = ok ? "blocked" : "exploited";
+  const head = ok ? `MODE=${mode} → BLOCKED${entry.guard_that_blocked?" by "+entry.guard_that_blocked:""}`
+                  : `MODE=${mode} → EXPLOITED`;
+  const d = entry.detail || {};
+  let kv = "";
+  const row = (k,v,c="") => `<tr><td>${k}</td><td class="${c}">${v}</td></tr>`;
+  if ("user_stated_budget_paise" in d){
+    kv += row("user stated budget", paise(d.user_stated_budget_paise));
+    kv += row("approval screen showed", paise(d.displayed_cap_paise));
+    kv += row("mandate actually signed", paise(d.signed_cap_paise), d.consent_faithful?"good":"bad");
+    kv += row("cart charged", paise(d.cart_total_paise));
+  } else if ("first_order_id" in d){
+    kv += row("authorisations signed", d.authorisations_signed ?? 1);
+    kv += row("orders created", d.orders_created ?? (d.replica_order_id?2:1),
+              (d.orders_created>1||d.replica_order_id)?"bad":"good");
+  } else if ("actual_payee" in d){
+    kv += row("allowlisted merchant", d.allowlisted_merchant);
+    kv += row("actual payee", d.actual_payee, "bad");
+  } else if ("step_up_threshold_paise" in d){
+    kv += row("amount", paise(d.amount_paise));
+    kv += row("step-up threshold", paise(d.step_up_threshold_paise));
+    kv += row("step-up performed", "no", "bad");
+  } else if ("reviewed_total_paise" in d){
+    kv += row("user reviewed", paise(d.reviewed_total_paise));
+    kv += row("actually signed", paise(d.signed_total_paise), "bad");
+  }
+  const quote = d.justification_forwarded_to_user
+    ? `<div class="quote">merchant text shown to the human:<br>“${d.justification_forwarded_to_user}”</div>` : "";
+  const why = d.why_not_caught ? `<div class="quote">why this is not caught: ${d.why_not_caught}</div>` : "";
+  const order = entry.order_id
+    ? `<div class="order">order ${entry.order_id} — ${entry.order_provenance}</div>` : "";
+  return el(`<div class="card ${cls}"><h2>${head}</h2><div class="body">
+      ${kv?`<table class="kv">${kv}</table>`:""}${quote}${why}
+      <div class="ev">${entry.evidence}</div>${order}</div></div>`);
+}
+
+document.getElementById("run").onclick = async (e) => {
+  const btn=e.target, name=document.getElementById("scenario").value;
+  btn.disabled=true; btn.textContent="Running…";
+  document.getElementById("scoreout").innerHTML="";
+  const out=document.getElementById("out"); out.innerHTML="";
+  try{
+    const r = await (await fetch(`/api/contrast/${name}`,{method:"POST"})).json();
+    const grid=el(`<div class="grid"></div>`);
+    grid.appendChild(card(r.vulnerable,"vulnerable"));
+    grid.appendChild(card(r.guarded,"guarded"));
+    out.appendChild(el(`<h3>${LABELS[name]||name}</h3>`));
+    out.appendChild(grid);
+    out.appendChild(el(r.blocked
+      ? `<div class="verdict">Same code. Same agent. Same poisoned catalog. The only
+         difference is one config flag: <strong>MODE</strong>. Blocked by
+         <strong>${r.guard}</strong>.</div>`
+      : `<div class="verdict none">This scenario is <strong>not blocked</strong> in guarded
+         mode. It is a declared gap — see the README.</div>`));
+  } finally { btn.disabled=false; btn.textContent="Run both modes"; }
+};
+
+document.getElementById("score").onclick = async (e) => {
+  const btn=e.target; btn.disabled=true; btn.textContent="Running every scenario…";
+  document.getElementById("out").innerHTML="";
+  const out=document.getElementById("scoreout"); out.innerHTML="";
+  try{
+    const rep = await (await fetch("/api/scorecard",{method:"POST"})).json();
+    let rows="";
+    for(const r of rep.results){
+      const v=`<span class="pill e">EXPLOITED</span>`;
+      const g=r.blocked?`<span class="pill b">BLOCKED</span>`:`<span class="pill m">MISSED</span>`;
+      rows+=`<tr><td>${r.scenario}</td><td>${v}</td><td>${g}</td>
+             <td>${r.actual_guard||(r.known_gap?"declared gap":"—")}</td>
+             <td>${r.threat_ref}</td></tr>`;
+    }
+    const t=rep.totals;
+    out.appendChild(el(`<h3>Scorecard</h3>`));
+    out.appendChild(el(`<table class="score"><thead><tr>
+       <th>Scenario</th><th>Vulnerable</th><th>Guarded</th><th>Guard</th><th>Threat</th>
+       </tr></thead><tbody>${rows}</tbody></table>
+       <div class="totals">BLOCKED ${t.blocked_in_guarded_mode}/${t.exploitable_in_vulnerable_mode} &nbsp;
+       MISSED ${t.missed_in_guarded_mode}/${t.exploitable_in_vulnerable_mode}<br>
+       <span style="color:var(--dim)">${t.claimed_blocked}/${t.claimed_coverage} of scenarios a guard
+       claims; ${t.declared_gaps} declared gaps with no guard behind them.</span></div>`));
+  } finally { btn.disabled=false; btn.textContent="Full scorecard"; }
+};
+
+boot();
+</script>
+</body>
+</html>
