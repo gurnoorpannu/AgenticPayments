@@ -44,14 +44,18 @@ SCENARIOS: list[tuple[Callable[..., AttackResult], Optional[str]]] = [
     (a4.suffix_extension, "G4"),
     # Declared gaps: no guard claims these. They are expected to get through,
     # and they are in the scorecard so the denominator is honest.
+    (a2.cross_verifier_replay, "G2"),
     (a5.rendered_vs_signed_divergence, None),
-    (a5.cross_verifier_replay, None),
     (a5.compromised_agent_key, None),
 ]
 
 
 def run_all(settings: Optional[Settings] = None) -> dict:
     settings = settings or get_settings()
+    # Start from a clean consumed-nonce set so a rerun reproduces the same
+    # results. In production this store is durable and never reset.
+    from guard.nonce_store import NonceStore
+    NonceStore(settings.db_path).reset()
     rows: list[dict] = []
 
     for scenario, expected_guard in SCENARIOS:

@@ -26,7 +26,15 @@ class NonceStore:
     """
 
     def __init__(self, db_path: str = ":memory:") -> None:
-        self._conn = sqlite3.connect(db_path, check_same_thread=False)
+        self._conn = sqlite3.connect(
+            db_path, check_same_thread=False, timeout=10.0, isolation_level=None
+        )
+        if db_path != ":memory:":
+            # Multiple verifier instances hold connections to this file at once.
+            # WAL lets readers and a writer coexist; busy_timeout makes a
+            # concurrent writer wait for the lock instead of failing outright.
+            self._conn.execute("PRAGMA journal_mode=WAL")
+        self._conn.execute("PRAGMA busy_timeout=10000")
         self._conn.execute(
             """
             CREATE TABLE IF NOT EXISTS consumed_nonces (

@@ -56,9 +56,14 @@ class MandateGuard:
     name = "MandateGuard"
     engaged = True
 
-    def __init__(self, db_path: str = ":memory:") -> None:
-        self.nonces = NonceStore(db_path)
-        self.audit = AuditChain(db_path, chained=True)
+    def __init__(self, nonce_db_path: str = ":memory:", audit_db_path: str = ":memory:") -> None:
+        # The consumed-nonce set is SHARED INFRASTRUCTURE: every verifier
+        # instance must see the same set, or replay survives horizontal
+        # scaling. The audit chain is per-session by design -- one chain per
+        # shopping session -- so it stays local. Conflating the two is what
+        # made cross-verifier replay possible in the first version.
+        self.nonces = NonceStore(nonce_db_path)
+        self.audit = AuditChain(audit_db_path, chained=True)
 
     def wrap_catalog(self, payload: str) -> str:
         """G1 layer 1: fence merchant-controlled text as untrusted data."""
@@ -148,9 +153,9 @@ class BypassedGuard:
     name = "BypassedGuard"
     engaged = False
 
-    def __init__(self, db_path: str = ":memory:") -> None:
-        self.nonces = NonceStore(db_path)          # exists but is never consulted
-        self.audit = AuditChain(db_path, chained=False)
+    def __init__(self, nonce_db_path: str = ":memory:", audit_db_path: str = ":memory:") -> None:
+        self.nonces = NonceStore(":memory:")       # exists but is never consulted
+        self.audit = AuditChain(audit_db_path, chained=False)
 
     def wrap_catalog(self, payload: str) -> str:
         """Catalog text goes into the model context raw, as trusted content."""
@@ -204,9 +209,20 @@ class BypassedGuard:
         return evaluate_unsigned(mandate.risk_data, amount_paise, step_up_threshold_paise), None
 
 
-def build_guard(mode, db_path: str = ":memory:") -> GuardLayer:
-    """Mode dispatch. This one call is the entire difference between the two runs."""
-    from config import Mode
+def build_guard(mode, nonce_db_path: Optional[str] = None) -> GuardLayer:
+    """Mode dispatch. This one call is the entire difference between the two runs.
+
+    `nonce_db_path` defaults to the configured DB_PATH so that every verifier
+    instance in a process -- and across restarts -- shares one consumed-nonce
+    set. Pass ":memory:" only to deliberately isolate an instance.
+    """
+    from config import Mode, get_settings
 
     mode = Mode(mode) if not isinstance(mode, Mode) else mode
-    return MandateGuard(db_path) if mode is Mode.GUARDED else BypassedGuard(db_path)
+    if nonce_db_path is None:
+        nonce_db_path = get_settings().db_path
+    return (
+        MandateGuard(nonce_db_path=nonce_db_path)
+        if mode is Mode.GUARDED
+        else BypassedGuard(nonce_db_path=nonce_db_path)
+    )

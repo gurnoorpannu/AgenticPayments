@@ -179,3 +179,73 @@ def replay_expired(mode: Mode, settings: Optional[Settings] = None) -> AttackRes
         agent_kind="scripted (no LLM involved -- protocol-level)",
         detail={"expires_at": stale_expiry, "failed_check": result.outcome.reason},
     )
+
+
+def cross_verifier_replay(mode: Mode, settings: Optional[Settings] = None) -> AttackResult:
+    """T-31 at deployment scale: replay against a SECOND verifier replica.
+
+    This scenario was a declared miss in the first build. The consumed-nonce
+    store was per-instance and opened at ":memory:", so a horizontally scaled
+    deployment gave every replica an empty consumed set and the same mandate
+    was honoured again. The store is now a shared SQLite database in WAL mode
+    with an atomic INSERT against a UNIQUE constraint, so a second replica
+    sees the nonce already consumed.
+
+    What this does NOT solve, and we do not claim it does: real multi-region
+    deployment needs a genuinely distributed store with consensus on
+    first-writer-wins. One SQLite file works for a single host. Two hosts with
+    two files reintroduces exactly this bug.
+    """
+    settings = settings or get_settings()
+    session = _session(settings, mode)
+    session.add_to_cart(CLEAN_PRODUCT)
+    first = session.checkout()
+    if not first.order:
+        return AttackResult(
+            name="cross_verifier_replay", threat_ref="F4 / T-31 (deployment)",
+            mode=mode_of(mode), succeeded=False,
+            evidence=f"setup failed: {first.summary}",
+            agent_kind="scripted (no LLM involved -- protocol-level)")
+
+    # A second verifier replica: same public keys, its own guard instance.
+    from guard import build_guard
+    from mandates.verifier import IndependentVerifier
+    replica = IndependentVerifier(session.registry.public_only(), build_guard(mode))
+
+    outcome = replica.authorize(
+        session.open_checkout_jwt, session.open_payment_jwt,
+        first.closed_checkout_jwt, first.closed_payment_jwt, session.cart,
+    )
+    order = None
+    if outcome.authorized and not outcome.step_up_required:
+        order = session.payments.create_order(
+            first.order.amount_paise, f"mg_replica_{first.checkout_hash[:8]}",
+            {"scenario": "cross_verifier_replay"})
+    succeeded = bool(order)
+
+    return AttackResult(
+        name="cross_verifier_replay",
+        threat_ref="F4 / T-31 (deployment)",
+        mode=mode_of(mode),
+        succeeded=succeeded,
+        evidence=(
+            f"mandate already consumed by verifier instance 1 (order {first.order.order_id}) "
+            f"was resubmitted to a second verifier replica. "
+            + (f"NOT BLOCKED -- order {order.order_id} created; the user is charged twice."
+               if succeeded else f"Blocked: {outcome.reason}")
+        ),
+        guard_that_blocked=outcome.failed_guard if not succeeded else None,
+        order_id=order.order_id if order else None,
+        order_provenance=order.provenance if order else None,
+        agent_kind="scripted (no LLM involved -- protocol-level)",
+        detail={
+            "first_order_id": first.order.order_id,
+            "replica_order_id": order.order_id if order else None,
+            "shared_nonce_store": settings.db_path,
+            "remaining_limitation": (
+                "one SQLite file covers a single host; multi-region deployment needs a "
+                "distributed store with first-writer-wins consensus"
+            ),
+            "failed_check": outcome.reason,
+        },
+    )

@@ -7,6 +7,11 @@ attempt to block it, not because it was constructed to fail.
 
 Do not "fix" these by special-casing the scenario. Either the guard gains a
 real mechanism that closes the class, or the miss stands and is documented.
+
+One scenario has already left this file: cross_verifier_replay was a declared
+miss until the consumed-nonce store was moved off per-instance memory onto a
+shared database. It now lives in a2_mandate_replay.py and is blocked. That is
+the intended lifecycle for everything here.
 """
 from __future__ import annotations
 
@@ -76,73 +81,6 @@ def rendered_vs_signed_divergence(mode: Mode, settings: Optional[Settings] = Non
                 "the cart shown to the user at review time was never signed, so there is "
                 "no committed reference to diff against"
             ),
-        },
-    )
-
-
-def cross_verifier_replay(mode: Mode, settings: Optional[Settings] = None) -> AttackResult:
-    """T-31 at deployment scale: the consumed-nonce store is not shared.
-
-    G2 stops replay within one verifier process. Our nonce store is a
-    per-instance SQLite database opened at ':memory:', so a second verifier
-    replica -- an ordinary horizontally-scaled deployment -- starts with an
-    empty consumed set and honours the same mandate again.
-
-    This is a property of our implementation, not of the guard's design: the
-    fix is a shared durable store (Redis, or a real database) behind an atomic
-    insert. We did not build that, so the miss is real and stands.
-    """
-    settings = settings or get_settings()
-    session = _session(settings, mode)
-    session.add_to_cart("prod_runner")
-    first = session.checkout()
-    if not first.order:
-        return AttackResult(
-            name="cross_verifier_replay", threat_ref="F4 / T-31 (deployment)",
-            mode=mode_of(mode), succeeded=False,
-            evidence=f"setup failed: {first.summary}",
-            agent_kind="scripted (no LLM involved -- protocol-level)")
-
-    # A second verifier replica: same public keys, same guard class, fresh state.
-    from guard import build_guard
-    from mandates.verifier import IndependentVerifier
-    replica_guard = build_guard(mode)
-    replica = IndependentVerifier(session.registry.public_only(), replica_guard)
-
-    outcome = replica.authorize(
-        session.open_checkout_jwt, session.open_payment_jwt,
-        first.closed_checkout_jwt, first.closed_payment_jwt, session.cart,
-    )
-    order = None
-    if outcome.authorized and not outcome.step_up_required:
-        order = session.payments.create_order(
-            first.order.amount_paise, f"mg_replica_{first.checkout_hash[:8]}",
-            {"scenario": "cross_verifier_replay"})
-    succeeded = bool(order)
-
-    return AttackResult(
-        name="cross_verifier_replay",
-        threat_ref="F4 / T-31 (deployment)",
-        mode=mode_of(mode),
-        succeeded=succeeded,
-        evidence=(
-            f"mandate already consumed by verifier instance 1 (order {first.order.order_id}) "
-            f"was resubmitted to a second verifier replica with its own nonce store. "
-            + (f"NOT BLOCKED -- order {order.order_id} created; the user is charged twice."
-               if succeeded else f"Blocked: {outcome.reason}")
-        ),
-        guard_that_blocked=outcome.failed_guard if not succeeded else None,
-        order_id=order.order_id if order else None,
-        order_provenance=order.provenance if order else None,
-        agent_kind="scripted (no LLM involved -- protocol-level)",
-        detail={
-            "first_order_id": first.order.order_id,
-            "replica_order_id": order.order_id if order else None,
-            "why_not_caught": (
-                "NonceStore is per-instance and opened at ':memory:'; a horizontally "
-                "scaled deployment gives each replica an empty consumed set"
-            ),
-            "fix_not_built": "shared durable nonce store with an atomic insert",
         },
     )
 

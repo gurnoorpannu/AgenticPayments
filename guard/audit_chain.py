@@ -42,7 +42,12 @@ class AuditChain:
     def __init__(self, db_path: str = ":memory:", chained: bool = True) -> None:
         """`chained=False` reproduces the vulnerable, unlinked log."""
         self.chained = chained
-        self._conn = sqlite3.connect(db_path, check_same_thread=False)
+        self._conn = sqlite3.connect(
+            db_path, check_same_thread=False, timeout=10.0, isolation_level=None
+        )
+        if db_path != ":memory:":
+            self._conn.execute("PRAGMA journal_mode=WAL")
+        self._conn.execute("PRAGMA busy_timeout=10000")
         self._conn.execute(
             """
             CREATE TABLE IF NOT EXISTS audit_log (
