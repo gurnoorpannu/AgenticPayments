@@ -103,6 +103,58 @@ class PaymentConstraints(BaseModel):
     expires_at: str
 
 
+# --- consent capture (AM1) --------------------------------------------------
+class UserIntent(BaseModel):
+    """What the human actually wants. The ground truth of the whole system.
+
+    This never travels over the wire and is never merchant-influenced. It is
+    the reference against which the guard renders an approval screen.
+    """
+
+    goal: str
+    budget_paise: int
+    merchants: list[str]
+    categories: list[str]
+
+
+class ConstraintProposal(BaseModel):
+    """What the AGENT proposes the user should authorise.
+
+    The agent builds this AFTER reading the catalog, which is exactly the
+    window AM1 attacks: poisoned listing text shapes the ceiling the agent
+    proposes, before the user ever sees an approval screen.
+    """
+
+    max_amount_paise: int
+    allowed_merchants: list[str]
+    allowed_categories: list[str]
+    #: Free text the agent offers to explain any headroom it asked for.
+    #: Frequently lifted verbatim from merchant-controlled catalog copy.
+    justification: str = ""
+    derived_from_catalog: bool = False
+
+
+class ApprovalRender(BaseModel):
+    """Exactly what is put in front of the human at the approval step.
+
+    `displayed_cap_paise` is what the user reads; `signed_cap_paise` is what
+    the mandate actually commits to. When those two diverge, the user's
+    signature does not mean what the user thinks it means -- that divergence
+    IS threat AM1, and this model exists so the demo can measure it.
+    """
+
+    displayed_cap_paise: int
+    signed_cap_paise: int
+    displayed_merchants: list[str]
+    justification_shown: str = ""
+    rendered_by: str = "trusted_surface"
+
+    @property
+    def faithful(self) -> bool:
+        """True when the user signs precisely what was shown to them."""
+        return self.displayed_cap_paise == self.signed_cap_paise
+
+
 # --- mandates ---------------------------------------------------------------
 class OpenCheckoutMandate(BaseModel):
     """Signed by the USER key at session start. Delegates shopping authority."""

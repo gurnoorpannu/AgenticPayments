@@ -15,11 +15,18 @@ from __future__ import annotations
 from typing import Optional, Protocol
 
 from guard.audit_chain import AuditChain
+from guard.consent_capture import ConsentOutcome, capture_faithful, capture_naive
 from guard.merchant_pinning import confusable_report, exact_match, fuzzy_match
 from guard.nonce_store import NonceStore
 from guard.risk_attestation import RiskDecision, evaluate_attested, evaluate_unsigned
 from guard.untrusted_content import ScopeVerdict, recheck_scope, wrap_untrusted
-from mandates.schemas import Cart, CheckoutConstraints, ClosedPaymentMandate
+from mandates.schemas import (
+    Cart,
+    CheckoutConstraints,
+    ClosedPaymentMandate,
+    ConstraintProposal,
+    UserIntent,
+)
 from mandates.signer import checkout_hash_of
 
 
@@ -28,6 +35,8 @@ class GuardLayer(Protocol):
     engaged: bool
 
     def wrap_catalog(self, payload: str) -> str: ...
+    def capture_consent(self, intent: UserIntent, proposal: Optional[ConstraintProposal],
+                        ttl_seconds: int) -> ConsentOutcome: ...
     def effective_constraints(self, user_signed: CheckoutConstraints,
                               agent_asserted: Optional[CheckoutConstraints]) -> tuple[CheckoutConstraints, Optional[str], str]: ...
     def payment_ceiling(self, pay_max_paise: int, effective_max_paise: int) -> tuple[int, Optional[str], str]: ...
@@ -54,6 +63,10 @@ class MandateGuard:
     def wrap_catalog(self, payload: str) -> str:
         """G1 layer 1: fence merchant-controlled text as untrusted data."""
         return wrap_untrusted(payload)
+
+    def capture_consent(self, intent, proposal, ttl_seconds=3600):
+        """G1a: the user signs their own number, rendered exactly."""
+        return capture_faithful(intent, proposal, ttl_seconds)
 
     def effective_constraints(self, user_signed, agent_asserted):
         """G1: authorisation scope comes from the USER-SIGNED mandate. Full stop.
@@ -142,6 +155,10 @@ class BypassedGuard:
     def wrap_catalog(self, payload: str) -> str:
         """Catalog text goes into the model context raw, as trusted content."""
         return payload
+
+    def capture_consent(self, intent, proposal, ttl_seconds=3600):
+        """Adopts the agent's proposed constraints; shows the user their own budget."""
+        return capture_naive(intent, proposal, ttl_seconds)
 
     def effective_constraints(self, user_signed, agent_asserted):
         """Trusts the agent's summary of its own authority.

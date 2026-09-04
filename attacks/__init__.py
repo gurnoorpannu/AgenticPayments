@@ -1,0 +1,44 @@
+"""Attack scenarios against the mandate pipeline.
+
+Every scenario returns the same structured result so the scorecard can be
+generated mechanically from real runs. No number in results/scorecard.json is
+written by hand.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any, Optional
+
+from config import Mode
+
+
+@dataclass
+class AttackResult:
+    name: str
+    threat_ref: str
+    mode: str
+    succeeded: bool
+    evidence: str
+    guard_that_blocked: Optional[str] = None
+    order_id: Optional[str] = None
+    order_provenance: Optional[str] = None
+    agent_kind: Optional[str] = None
+    detail: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "threat_ref": self.threat_ref,
+            "mode": self.mode,
+            "succeeded": self.succeeded,
+            "evidence": self.evidence,
+            "guard_that_blocked": self.guard_that_blocked,
+            "order_id": self.order_id,
+            "order_provenance": self.order_provenance,
+            "agent_kind": self.agent_kind,
+            "detail": self.detail,
+        }
+
+
+def mode_of(mode: Mode | str) -> str:
+    return mode.value if isinstance(mode, Mode) else str(mode)

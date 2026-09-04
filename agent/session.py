@@ -16,8 +16,10 @@ from mandates.crypto import KeyRegistry, build_registry
 from mandates.schemas import (
     Cart,
     CheckoutConstraints,
+    ConstraintProposal,
     PaymentConstraints,
     RiskData,
+    UserIntent,
     VerificationOutcome,
     iso_in,
 )
@@ -60,6 +62,8 @@ class ShoppingSession:
         allowed_merchants: Optional[list[str]] = None,
         allowed_categories: Optional[list[str]] = None,
         ttl_seconds: int = 3600,
+        intent: Optional[UserIntent] = None,
+        constraint_proposal: Optional[ConstraintProposal] = None,
     ) -> None:
         self.settings = settings or get_settings()
         self.mode = mode or self.settings.mode
@@ -79,17 +83,28 @@ class ShoppingSession:
         allowed_merchants = allowed_merchants or [self.catalog.canonical_merchant]
         allowed_categories = allowed_categories or ["footwear"]
 
-        self.checkout_constraints = CheckoutConstraints(
-            max_amount_paise=max_amount_paise,
-            allowed_merchants=list(allowed_merchants),
-            allowed_categories=list(allowed_categories),
-            expires_at=iso_in(ttl_seconds),
+        # --- consent capture (AM1) -----------------------------------------
+        # The user's stated intent is the ground truth. The agent may propose a
+        # constraint set, but WHO gets to decide the final numbers -- and what
+        # the human is shown before signing -- is the guard's call.
+        self.intent = intent or UserIntent(
+            goal="buy running shoes",
+            budget_paise=max_amount_paise,
+            merchants=list(allowed_merchants),
+            categories=list(allowed_categories),
         )
+        self.constraint_proposal = constraint_proposal
+        self.consent = self.guard.capture_consent(self.intent, constraint_proposal, ttl_seconds)
+        self.approval_render = self.consent.render
+
+        self.checkout_constraints = self.consent.constraints
+        # Both open mandates are signed at the same approval moment, so the
+        # payment ceiling inherits whatever ceiling the user actually approved.
         self.payment_constraints = PaymentConstraints(
-            max_amount_paise=max_amount_paise,
-            allowed_payees=list(allowed_merchants),
+            max_amount_paise=self.consent.constraints.max_amount_paise,
+            allowed_payees=list(self.consent.constraints.allowed_merchants),
             step_up_threshold_paise=step_up_threshold_paise,
-            expires_at=iso_in(ttl_seconds),
+            expires_at=self.consent.constraints.expires_at,
         )
 
         self.open_checkout, self.open_checkout_jwt = self.signer.sign_open_checkout(
@@ -99,9 +114,18 @@ class ShoppingSession:
             self.session_id, self.payment_constraints
         )
         self.guard.audit.append(
+            "consent.captured",
+            {"user_stated_budget_paise": self.intent.budget_paise,
+             "displayed_cap_paise": self.approval_render.displayed_cap_paise,
+             "signed_cap_paise": self.approval_render.signed_cap_paise,
+             "faithful": self.approval_render.faithful,
+             "rendered_by": self.approval_render.rendered_by,
+             "detail": self.consent.detail},
+        )
+        self.guard.audit.append(
             "session.opened",
             {"session_id": self.session_id, "mode": self.mode.value,
-             "max_amount_paise": max_amount_paise,
+             "max_amount_paise": self.checkout_constraints.max_amount_paise,
              "allowed_merchants": self.checkout_constraints.allowed_merchants},
         )
 
