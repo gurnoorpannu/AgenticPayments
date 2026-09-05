@@ -21,6 +21,7 @@ from attacks import a2_mandate_replay as a2
 from attacks import a3_risk_data_spoof as a3
 from attacks import a4_merchant_substitution as a4
 from attacks import a5_known_gaps as a5
+from attacks import legit_suite
 from config import Mode, Settings, get_settings
 
 RESULTS_DIR = Path(__file__).resolve().parent.parent / "results"
@@ -74,6 +75,12 @@ def run_all(settings: Optional[Settings] = None) -> dict:
             "exploitable_in_vulnerable_mode": vulnerable.succeeded,
         })
 
+    # False-positive suite: legitimate purchases that must NOT be blocked.
+    # A guard that fails closed on everything scores perfectly above and is
+    # useless in production, so both numbers are reported together.
+    legit = [r.to_dict() for r in legit_suite.run_all(settings)]
+    legit_allowed = [r for r in legit if r["allowed"]]
+
     exploitable = [r for r in rows if r["exploitable_in_vulnerable_mode"]]
     blocked = [r for r in exploitable if r["blocked"]]
     missed = [r for r in exploitable if not r["blocked"]]
@@ -104,7 +111,11 @@ def run_all(settings: Optional[Settings] = None) -> dict:
             "blocked_in_guarded_mode": len(blocked),
             "missed_in_guarded_mode": len(missed),
             "not_reproduced": len(not_reproduced),
+            "legitimate_scenarios": len(legit),
+            "legitimate_allowed": len(legit_allowed),
+            "false_positives": len(legit) - len(legit_allowed),
         },
+        "false_positive_suite": legit,
         "misses": [r["scenario"] for r in missed],
         "results": rows,
     }
@@ -147,6 +158,32 @@ def print_table(report: dict) -> None:
         print(f"  MISSES: {', '.join(report['misses'])}")
     else:
         print("  MISSES: none in this scenario set (see README for what is NOT covered)")
+    print("=" * 96)
+    print()
+    print_false_positives(report)
+
+
+def print_false_positives(report: dict) -> None:
+    """The other half of the question: does the guard block real customers?"""
+    legit = report.get("false_positive_suite", [])
+    if not legit:
+        return
+    w = 36
+    print("-" * 96)
+    print("  FALSE-POSITIVE SUITE -- legitimate purchases, guarded mode")
+    print("  Each sits on a boundary where a fail-closed check is most likely to over-fire.")
+    print("-" * 96)
+    print(f"{'SCENARIO':<{w}} {'GUARD':<11} {'RESULT':<10} INTENT")
+    print("-" * 96)
+    for row in legit:
+        verdict = "ALLOWED" if row["allowed"] else "BLOCKED"
+        print(f"{row['name']:<{w}} {row['guard_under_test']:<11} {verdict:<10} {row['intent'][:44]}")
+        if not row["allowed"]:
+            print(f"{'':<{w}} {'':<11} {'':<10} -> {row['evidence']}")
+    t = report["totals"]
+    print("-" * 96)
+    print(f"  LEGITIMATE ALLOWED: {t['legitimate_allowed']}/{t['legitimate_scenarios']}   "
+          f"FALSE POSITIVES: {t['false_positives']}")
     print("=" * 96)
     print()
 

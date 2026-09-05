@@ -44,6 +44,42 @@ class AttackResult:
         }
 
 
+@dataclass
+class LegitResult:
+    """Outcome of a scenario that SHOULD be allowed through in guarded mode.
+
+    A guard that fails closed on everything blocks 16/16 attacks and is
+    useless. These scenarios measure the other half of the question: does the
+    guard wrongly stop real customers? Every one of them sits on a boundary
+    where a fail-closed check is most likely to over-fire.
+    """
+
+    name: str
+    guard_under_test: str
+    intent: str
+    allowed: bool
+    evidence: str
+    blocked_by: Optional[str] = None
+    order_id: Optional[str] = None
+    order_provenance: Optional[str] = None
+    checks: list[dict[str, Any]] = field(default_factory=list)
+    detail: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "guard_under_test": self.guard_under_test,
+            "intent": self.intent,
+            "allowed": self.allowed,
+            "evidence": self.evidence,
+            "blocked_by": self.blocked_by,
+            "order_id": self.order_id,
+            "order_provenance": self.order_provenance,
+            "checks": self.checks,
+            "detail": self.detail,
+        }
+
+
 def checks_of(outcome) -> list[dict[str, Any]]:
     """Flatten a VerificationOutcome's named checks for transport to a UI."""
     return [c.model_dump() for c in outcome.checks]

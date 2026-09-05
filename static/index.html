@@ -224,6 +224,8 @@ table.score td.sc{color:var(--ink)}
 .pill.b{background:var(--grn-bg);color:var(--grn);border:1px solid var(--grn-line)}
 .pill.m{background:var(--amb-bg);color:var(--amb);border:1px solid var(--amb-line)}
 .gtag{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.fpnote{margin:20px 0 0;padding:13px 16px;border-radius:10px;font-size:13px;color:var(--dim);
+  background:var(--panel);border:1px solid var(--line)}
 
 footer{border-top:1px solid var(--line);margin-top:40px;padding:30px 0 60px;color:var(--dim2);font-size:12.5px}
 footer a{color:var(--blu);text-decoration:none} footer a:hover{text-decoration:underline}
@@ -477,6 +479,11 @@ $("#score").onclick = async e => {
   try{
     const rep = await (await fetch("/api/scorecard",{method:"POST"})).json();
     const t = rep.totals;
+    const fprows = (rep.false_positive_suite||[]).map((r,i) => `<tr style="animation-delay:${i*26}ms">
+        <td class="sc">${r.name}</td>
+        <td><span class="pill ${r.allowed?'b':'e'}">${r.allowed?'ALLOWED':'BLOCKED'}</span></td>
+        <td class="gtag">${r.guard_under_test}</td>
+        <td>${r.intent}</td></tr>`).join("");
     const rows = rep.results.map((r,i) => `<tr style="animation-delay:${i*26}ms">
         <td class="sc">${r.scenario}</td>
         <td><span class="pill e">EXPLOITED</span></td>
@@ -488,11 +495,17 @@ $("#score").onclick = async e => {
         <div class="stat g"><div class="lab">Blocked</div><div class="big">${t.blocked_in_guarded_mode}/${t.exploitable_in_vulnerable_mode}</div><div class="sub">in guarded mode</div></div>
         <div class="stat a"><div class="lab">Missed</div><div class="big">${t.missed_in_guarded_mode}/${t.exploitable_in_vulnerable_mode}</div><div class="sub">declared gaps</div></div>
         <div class="stat r"><div class="lab">Exploitable</div><div class="big">${t.exploitable_in_vulnerable_mode}/${t.scenarios}</div><div class="sub">in vulnerable mode</div></div>
-        <div class="stat"><div class="lab">Guard claims</div><div class="big">${t.claimed_blocked}/${t.claimed_coverage}</div><div class="sub">where a guard claims coverage</div></div>
+        <div class="stat g"><div class="lab">Legitimate allowed</div><div class="big">${t.legitimate_allowed}/${t.legitimate_scenarios}</div><div class="sub">${t.false_positives} false positives</div></div>
       </div>
       <div class="tablewrap"><table class="score"><thead><tr>
         <th>Scenario</th><th>Vulnerable</th><th>Guarded</th><th>Guard</th><th>Threat</th>
-      </tr></thead><tbody>${rows}</tbody></table></div>`;
+      </tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="fpnote">A guard that fails closed on everything blocks every attack and is useless.
+        These legitimate purchases each sit on a boundary where a fail-closed check is most likely
+        to over-fire — exactly at a cap, exactly at a threshold, a second purchase in one session.</div>
+      <div class="tablewrap" style="margin-top:12px"><table class="score"><thead><tr>
+        <th>Legitimate scenario</th><th>Result</th><th>Guard tested</th><th>Intent</th>
+      </tr></thead><tbody>${fprows}</tbody></table></div>`;
   }catch(err){
     $("#scoreout").innerHTML = `<div class="banner warn">Scorecard failed: ${err}</div>`;
   }finally{ btn.disabled=false; btn.classList.remove("busy"); btn.textContent=label; $("#hint").textContent=""; }
