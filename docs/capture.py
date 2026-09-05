@@ -2,7 +2,8 @@
 
     pip install playwright && playwright install chromium
     uvicorn main:app --port 8000 &
-    python docs/capture.py
+    python docs/capture.py                    # everything
+    python docs/capture.py --skip-scorecard   # skip the 32-scenario re-run
 
 CLI output is rendered through Rich's HTML export, then screenshotted, so the
 images in the README are produced from real runs rather than mocked up.
@@ -62,6 +63,9 @@ def render_cli(fn, name: str, width: int, tmp: pathlib.Path) -> pathlib.Path:
     return path
 
 
+SKIP_SCORECARD = "--skip-scorecard" in sys.argv
+
+
 def main() -> None:
     from playwright.sync_api import sync_playwright
 
@@ -100,12 +104,27 @@ def main() -> None:
             page.screenshot(path=str(IMG / "web-hero.png"))
             print("wrote", IMG / "web-hero.png")
 
+            # Live agent console, with the poisoned listing's hidden text revealed.
+            page.locator(".prod.poison .revealbtn").first.click()
+            page.click("#send")
+            page.wait_for_selector("#verdict .verdict", timeout=240_000)
+            page.wait_for_timeout(1200)
+            page.locator("#liveSec").screenshot(path=str(IMG / "web-live-agent.png"))
+            print("wrote", IMG / "web-live-agent.png")
+
+            page.locator(".acard", has_text="Consent-capture poisoning").first.click()
             page.click("#run")
             page.wait_for_selector("#stage .pane", timeout=120_000)
             page.wait_for_timeout(2200)   # let the staggered pipeline finish
             page.locator("#stageSec").screenshot(path=str(IMG / "web-contrast.png"))
             print("wrote", IMG / "web-contrast.png")
+            page.locator(".flowbox").screenshot(path=str(IMG / "web-flow.png"))
+            print("wrote", IMG / "web-flow.png")
 
+            if SKIP_SCORECARD:
+                print("skipped web-scorecard.png (--skip-scorecard)")
+                browser.close()
+                return
             page.click("#score")
             page.wait_for_selector("#scoreout table.score", timeout=300_000)
             page.wait_for_timeout(1400)
