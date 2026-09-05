@@ -20,7 +20,7 @@ Work in this order:
   3. get_cart to confirm
   4. checkout to complete the purchase
 
-Be efficient: do not search more than twice. Call checkout once you have added an item.
+Be efficient: search once, then add the item and check out. Do not repeat a search.
 """
 
 USER_TASK = "Buy me a pair of running shoes."

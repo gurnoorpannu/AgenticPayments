@@ -5,17 +5,20 @@ Run:  uvicorn main:app --reload    then open http://127.0.0.1:8000
 from __future__ import annotations
 
 import json
+import queue
+import threading
 from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from attacks import a1_catalog_injection as a1
 from attacks import a2_mandate_replay as a2
 from attacks import a3_risk_data_spoof as a3
 from attacks import a4_merchant_substitution as a4
+import acceptance
 from attacks import a5_known_gaps as a5
 from config import Mode, get_settings
 
@@ -112,6 +115,122 @@ def api_scorecard_cached() -> JSONResponse:
     if not path.exists():
         raise HTTPException(404, "no scorecard yet -- POST /api/scorecard to generate one")
     return JSONResponse(json.loads(path.read_text()))
+
+
+# --------------------------------------------------------------------------
+# Acceptance layer: MandateGuard as an integrable service
+# --------------------------------------------------------------------------
+@app.get("/api/catalog")
+def api_catalog() -> dict:
+    """The storefront, including the poisoned listings.
+
+    `injection_signals` reports which suspicious phrasings were detected in a
+    description. That detection is for display and audit only -- it is never
+    the control. See guard.untrusted_content.
+    """
+    from catalog.service import CatalogService
+    from guard.untrusted_content import detect_injection_signals
+
+    catalog = CatalogService()
+    return {
+        "canonical_merchant": catalog.canonical_merchant,
+        "merchants": catalog.merchants,
+        "products": [
+            {**p.model_dump(), "injection_signals": detect_injection_signals(p.description)}
+            for p in catalog.all()
+        ],
+    }
+
+
+@app.post("/v1/session")
+def v1_session(req: acceptance.SessionRequest) -> dict:
+    """Capture consent and mint the user-signed open mandates."""
+    _, payload = acceptance.open_session(req, get_settings())
+    return payload
+
+
+@app.post("/v1/authorize")
+def v1_authorize(req: acceptance.AuthorizeRequest) -> dict:
+    """Submit a cart for authorisation. Money moves only if every check holds."""
+    try:
+        return acceptance.authorize(req)
+    except KeyError:
+        raise HTTPException(404, f"unknown session '{req.session_id}'")
+
+
+@app.get("/v1/agent/stream")
+def v1_agent_stream(
+    task: str = Query("Buy me a pair of running shoes."),
+    mode: str = Query("guarded", pattern="^(vulnerable|guarded)$"),
+    budget_paise: int = Query(200_000, gt=0),
+    agent_proposes: bool = Query(True),
+) -> StreamingResponse:
+    """Run the shopping agent and stream its work as server-sent events.
+
+    Emits: session (consent capture) -> step (one per tool call) -> result.
+    The agent runs in a worker thread and pushes onto a queue so the browser
+    sees each tool call as it happens rather than after the fact.
+    """
+    from agent.shopping_agent import build_agent
+
+    settings = get_settings()
+    session, session_payload = acceptance.open_session(
+        acceptance.SessionRequest(
+            mode=mode, budget_paise=budget_paise, goal=task,
+            agent_proposes_constraints=agent_proposes,
+        ),
+        settings,
+    )
+    agent = build_agent(settings)
+    events: "queue.Queue[Optional[dict]]" = queue.Queue()
+
+    def worker() -> None:
+        try:
+            events.put({"type": "agent", "agent_kind": agent.agent_kind})
+            run = agent.run(
+                session, task=task,
+                on_step=lambda st: events.put({
+                    "type": "step", "tool": st.tool,
+                    "arguments": st.arguments, "result": st.result[:1200],
+                }),
+            )
+            intact, chain_detail = session.guard.audit.verify_chain()
+            events.put({
+                "type": "result",
+                "agent_kind": run.agent_kind,
+                "obeyed_injection": run.obeyed_injection,
+                "cart_total_paise": session.cart.total_paise,
+                "cart": [i.model_dump() for i in session.cart.items],
+                "audit_chain_intact": intact,
+                "audit_chain_detail": chain_detail,
+                "last_result": session.last_checkout_payload,
+                # The agent may finish without ever calling checkout -- in
+                # guarded mode it often sees the real ceiling and declines on
+                # its own. That is a different outcome from "the guard blocked
+                # it", and the UI must not conflate the two.
+                "attempted_checkout": session.last_checkout_payload is not None,
+            })
+        except Exception as exc:  # surfaced to the UI rather than swallowed
+            events.put({"type": "error", "message": f"{type(exc).__name__}: {exc}"})
+        finally:
+            events.put(None)
+
+    threading.Thread(target=worker, daemon=True).start()
+
+    def stream():
+        yield f"data: {json.dumps({'type': 'session', **session_payload})}\n\n"
+        while True:
+            item = events.get()
+            if item is None:
+                yield f"data: {json.dumps({'type': 'done'})}\n\n"
+                return
+            yield f"data: {json.dumps(item)}\n\n"
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.get("/api/purchase")

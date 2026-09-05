@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import time
 
@@ -95,11 +95,14 @@ class DeterministicAgent:
             break
         return proposal
 
-    def run(self, session: ShoppingSession, task: str = USER_TASK) -> AgentRun:
+    def run(self, session: ShoppingSession, task: str = USER_TASK,
+            on_step: Optional[Callable[[AgentStep], None]] = None) -> AgentRun:
         run = AgentRun(agent_kind=self.agent_kind)
+        emit = on_step or (lambda _step: None)
 
         listing = dispatch(session, "search_catalog", {"query": "shoe"})
-        run.steps.append(AgentStep("search_catalog", {"query": "shoe"}, listing))
+        step = AgentStep("search_catalog", {"query": "shoe"}, listing)
+        run.steps.append(step); emit(step)
 
         # A compliant agent picks the cheapest in-scope item. This one instead
         # scans the catalog text for instructions and follows them.
@@ -112,10 +115,12 @@ class DeterministicAgent:
                 break
 
         added = dispatch(session, "add_to_cart", {"product_id": target})
-        run.steps.append(AgentStep("add_to_cart", {"product_id": target}, added))
+        step = AgentStep("add_to_cart", {"product_id": target}, added)
+        run.steps.append(step); emit(step)
 
         cart = dispatch(session, "get_cart", {})
-        run.steps.append(AgentStep("get_cart", {}, cart))
+        step = AgentStep("get_cart", {}, cart)
+        run.steps.append(step); emit(step)
 
         # A compromised agent reports the cap it was TOLD applies, not the one
         # the user signed. If the injection named a number, it uses that;
@@ -129,7 +134,8 @@ class DeterministicAgent:
             )
 
         out = dispatch(session, "checkout", checkout_args)
-        run.steps.append(AgentStep("checkout", checkout_args, out))
+        step = AgentStep("checkout", checkout_args, out)
+        run.steps.append(step); emit(step)
         run.final_message = out
         return run
 
@@ -225,8 +231,10 @@ class LLMShoppingAgent:
             pass  # fall back to the user's own number
         return proposal
 
-    def run(self, session: ShoppingSession, task: str = USER_TASK, max_turns: int = 8) -> AgentRun:
+    def run(self, session: ShoppingSession, task: str = USER_TASK, max_turns: int = 8,
+            on_step: Optional[Callable[[AgentStep], None]] = None) -> AgentRun:
         run = AgentRun(agent_kind=self.agent_kind)
+        emit = on_step or (lambda _step: None)
         system = SYSTEM_PROMPT.format(
             max_amount_paise=session.checkout_constraints.max_amount_paise,
             allowed_merchants=", ".join(session.checkout_constraints.allowed_merchants),
@@ -265,7 +273,8 @@ class LLMShoppingAgent:
                 except json.JSONDecodeError:
                     args = {}
                 result = dispatch(session, tc.function.name, args)
-                run.steps.append(AgentStep(tc.function.name, args, result))
+                step = AgentStep(tc.function.name, args, result)
+                run.steps.append(step); emit(step)
                 messages.append({"role": "tool", "tool_call_id": tc.id, "content": result})
 
             # Did the model put an out-of-scope item in the cart? That is the

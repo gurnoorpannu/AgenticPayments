@@ -79,6 +79,8 @@ class ShoppingSession:
         self.catalog = CatalogService()
         self.payments = build_payment_client(self.settings)
         self.cart = Cart(session_id=self.session_id)
+        #: Summary of the most recent checkout, for UIs that observe a run.
+        self.last_checkout_payload: Optional[dict[str, Any]] = None
 
         allowed_merchants = allowed_merchants or [self.catalog.canonical_merchant]
         allowed_categories = allowed_categories or ["footwear"]
@@ -300,4 +302,22 @@ class ShoppingSession:
                 {"order_id": order.order_id, "amount_paise": order.amount_paise,
                  "provenance": order.provenance, "payee_id": payee_id},
             )
+
+        self.last_checkout_payload = {
+            "authorized": result.authorized,
+            "step_up_required": result.step_up_required,
+            "guard": outcome.failed_guard,
+            "declined_reason": None if result.authorized else outcome.reason,
+            "amount_paise": amount_paise,
+            "merchant_id": merchant_id,
+            "payee_id": payee_id,
+            "checks": [c.model_dump() for c in outcome.checks],
+            "order": None if not result.order else {
+                "order_id": result.order.order_id,
+                "amount_paise": result.order.amount_paise,
+                "status": result.order.status,
+                "provenance": result.order.provenance,
+            },
+            "notes": notes,
+        }
         return result
